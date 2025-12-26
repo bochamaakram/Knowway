@@ -86,5 +86,22 @@ CREATE TABLE scraped_data (
 CREATE INDEX idx_scraped_user ON scraped_data(user_id);
 CREATE INDEX idx_scraped_category ON scraped_data(category);
 
+-- Course Lessons (parts of a course)
+CREATE TABLE course_lessons (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    video_url VARCHAR(500),
+    order_index INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_lessons_course ON course_lessons(course_id);
+CREATE INDEX idx_lessons_order ON course_lessons(course_id, order_index);
+
 SELECT 'Schema created successfully!' as message;
+
 

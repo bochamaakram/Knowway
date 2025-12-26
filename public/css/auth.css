@@ -1,0 +1,78 @@
+/* Auth Pages Styles */
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl);
+}
+
+@media (max-width: 768px) {
+    .auth-left {
+        display: none;
+    }
+}
+
+.auth-left-content {
+    color: var(--crust);
+    max-width: 400px;
+}
+
+.auth-left h1 {
+    font-size: 36px;
+    margin-bottom: var(--space-md);
+}
+
+.auth-left p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.auth-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl);
+    background: var(--base);
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: var(--space-xl);
+    display: block;
+    text-decoration: none;
+}
+
+.auth-box h2 {
+    font-size: 24px;
+    margin-bottom: var(--space-xs);
+}
+
+.auth-box .subtitle {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: var(--space-lg);
+    color: var(--text-secondary);
+}
+
+.auth-footer a {
+    color: var(--primary);
+}

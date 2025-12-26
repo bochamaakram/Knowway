@@ -1,0 +1,18 @@
+/* Explore Page Styles */
+.filter-sidebar {
+    position: sticky;
+    top: 80px;
+}
+
+.filter-group {
+    margin-bottom: var(--space-lg);
+}
+
+.filter-group-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+}

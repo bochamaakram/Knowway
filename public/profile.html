@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | knowway</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="learning.html" class="navbar-brand">knowway</a>
+            <div class="navbar-search">
+                <input type="text" placeholder="Search for anything">
+            </div>
+            <ul class="navbar-nav">
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="learning.html">My Learning</a></li>
+            </ul>
+            <div class="navbar-user" id="navbarUser"></div>
+        </div>
+    </nav>
+
+    <main class="container dashboard-container">
+        <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <div class="profile-info">
+                <h1><span id="profileName">User</span><span class="role-badge learner" id="roleBadge">Learner</span>
+                </h1>
+                <p id="profileEmail">user@example.com</p>
+            </div>
+            <div class="profile-actions">
+                <a href="course-editor.html" id="manageLink" class="btn btn-primary btn-sm" style="display:none">Manage
+                    Courses</a>
+                <a href="admin.html" id="adminLink" class="btn btn-secondary btn-sm" style="display:none">Admin
+                    Panel</a>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Log out</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-icon courses">📚</div>
+                <div class="stat-card-value" id="statEnrolled">0</div>
+                <div class="stat-card-label">Enrolled Courses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon completed">✓</div>
+                <div class="stat-card-value" id="statCompleted">0</div>
+                <div class="stat-card-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon hours">⏱</div>
+                <div class="stat-card-value" id="statHours">0</div>
+                <div class="stat-card-label">Hours Learned</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-icon certificates">🏆</div>
+                <div class="stat-card-value" id="statCertificates">0</div>
+                <div class="stat-card-label">Certificates</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Continue Learning</h2>
+                        <a href="learning.html" class="panel-link">See all</a>
+                    </div>
+                    <div id="progressList"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Recent Activity</h2>
+                    </div>
+                    <div id="activityList"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Wishlist</h2>
+                        <a href="explore.html" class="panel-link">Browse</a>
+                    </div>
+                    <div id="wishlistPreview"></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2 class="panel-title">Quick Actions</h2>
+                    </div>
+                    <a class="quick-action" href="explore.html">
+                        <div class="quick-action-icon">🔍</div>
+                        <div class="quick-action-text">Browse Courses</div>
+                    </a>
+                    <a class="quick-action" href="learning.html">
+                        <div class="quick-action-icon">📖</div>
+                        <div class="quick-action-text">My Learning</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pages/profile.js"></script>
+</body>
+
+</html>

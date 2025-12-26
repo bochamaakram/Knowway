@@ -4,274 +4,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Details | knowway</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Course | knowway</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/course.css">
 </head>
 
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="index.html" class="navbar-brand">knowway</a>
+            <a href="learning.html" class="navbar-brand">knowway</a>
             <ul class="navbar-nav">
-                <li><a href="hub.html">Explore</a></li>
-                <li><a href="index.html">My Learning</a></li>
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="learning.html">My Learning</a></li>
             </ul>
             <div class="navbar-user" id="navbarUser"></div>
         </div>
     </nav>
 
-    <div id="loadingState" style="padding:100px 0;text-align:center">
+    <div id="loadingState" class="empty-state" style="padding:100px">
         <div class="spinner"></div>
     </div>
 
     <div id="courseContent" style="display:none">
-        <section class="course-hero">
-            <div class="container">
-                <div class="course-hero-grid">
-                    <div>
-                        <div class="breadcrumb" id="breadcrumb"></div>
-                        <h1 id="courseTitle"></h1>
-                        <p class="course-hero-subtitle" id="courseSubtitle"></p>
-                        <p id="courseMeta" style="color:var(--subtext0);font-size:14px;margin-bottom:12px"></p>
-                        <p style="color:#CEC9DC;font-size:14px">Created by <a href="#"
-                                style="color:var(--primary-light)" id="instructorLink"></a></p>
-                        <div class="course-hero-meta">
-                            <span id="lastUpdated"></span>
-                            <span id="language"></span>
+        <div class="course-layout">
+            <aside class="course-sidebar">
+                <div class="course-sidebar-header">
+                    <div class="course-sidebar-title" id="sidebarTitle"></div>
+                    <div class="course-sidebar-meta" id="sidebarMeta"></div>
+                </div>
+                <ul class="lessons-nav" id="lessonsNav"></ul>
+                <div style="margin-top:var(--space-lg)">
+                    <button id="enrollBtn" class="btn btn-primary" style="width:100%" onclick="handleEnroll()">Enroll
+                        Now</button>
+                </div>
+            </aside>
+
+            <main class="course-content">
+                <div class="mobile-nav">
+                    <select id="mobileSelect" class="form-control" onchange="navigateToLesson(this.value)"></select>
+                </div>
+
+                <div id="overviewContent">
+                    <div class="course-overview">
+                        <div class="content-header">
+                            <h1 id="courseTitle"></h1>
+                            <p id="courseSubtitle" style="font-size:18px;color:var(--text-secondary);line-height:1.6">
+                            </p>
+                            <p class="progress-text" id="lessonCount"></p>
+                        </div>
+                        <img id="courseImage"
+                            style="width:100%;border-radius:var(--radius-lg);margin-bottom:var(--space-xl)">
+
+                        <div class="overview-section">
+                            <h2>About This Course</h2>
+                            <p id="courseDescription" style="line-height:1.8"></p>
+                        </div>
+
+                        <div class="overview-section" id="learnSection">
+                            <h2>What You'll Learn</h2>
+                            <ul id="whatYouLearn"></ul>
+                        </div>
+
+                        <div class="enroll-box">
+                            <div class="enroll-price" id="coursePrice">Free</div>
+                            <button id="mainEnrollBtn" class="btn btn-primary btn-lg" onclick="handleEnroll()">Enroll
+                                Now</button>
+                            <p style="font-size:13px;color:var(--text-muted);margin-top:var(--space-md)">Full lifetime
+                                access</p>
                         </div>
                     </div>
-                    <div class="course-preview-card">
-                        <img id="courseImage" src="" class="course-preview-img">
-                        <div class="course-preview-body">
-                            <div class="course-preview-price">
-                                <span id="currentPrice"></span>
-                                <span class="course-preview-original" id="originalPrice"></span>
-                                <span class="course-preview-discount" id="discountPercent"></span>
+                </div>
+
+                <div id="lessonContent" style="display:none">
+                    <div class="lesson-content">
+                        <div id="lessonVideo"></div>
+                        <article id="lessonBody"></article>
+                    </div>
+
+                    <div class="lesson-navigation">
+                        <a id="prevBtn" class="nav-btn disabled" href="#">
+                            <span>←</span>
+                            <div>
+                                <div class="nav-btn-label">Previous</div>
+                                <div class="nav-btn-title" id="prevTitle">-</div>
                             </div>
-                            <button id="buyBtn" class="btn btn-dark btn-lg" style="width:100%;margin-bottom:8px"
-                                onclick="handleBuy()">Buy now</button>
-                            <button id="wishlistBtn" class="btn btn-secondary btn-lg" style="width:100%"
-                                onclick="toggleWishlist()">Add to Wishlist</button>
-                            <p style="text-align:center;font-size:12px;color:var(--text-secondary);margin-top:12px">
-                                30-Day Money-Back Guarantee</p>
-                            <ul style="font-size:14px;margin-top:16px;list-style:none">
-                                <li style="padding:4px 0" id="featureDuration"></li>
-                                <li style="padding:4px 0" id="featureLessons"></li>
-                                <li style="padding:4px 0">Full lifetime access</li>
-                                <li style="padding:4px 0">Certificate of completion</li>
-                            </ul>
-                        </div>
+                        </a>
+                        <a id="nextBtn" class="nav-btn disabled" href="#">
+                            <div style="text-align:right">
+                                <div class="nav-btn-label">Next</div>
+                                <div class="nav-btn-title" id="nextTitle">-</div>
+                            </div>
+                            <span>→</span>
+                        </a>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <div class="course-content">
-            <div class="container">
-                <div style="max-width:700px">
-                    <div class="content-section">
-                        <h2>What you'll learn</h2>
-                        <div class="what-learn-grid" id="whatYouLearn"></div>
-                    </div>
-
-                    <div class="content-section">
-                        <h2>Requirements</h2>
-                        <ul class="requirements-list" id="requirements"></ul>
-                    </div>
-
-                    <div class="content-section">
-                        <h2>Description</h2>
-                        <p style="white-space:pre-line;color:var(--text-secondary);line-height:1.8" id="description">
-                        </p>
-                    </div>
-
-                    <div class="content-section">
-                        <h2>Who this course is for</h2>
-                        <ul class="requirements-list" id="whoIsFor"></ul>
-                    </div>
-                </div>
-            </div>
+            </main>
         </div>
     </div>
 
     <div id="toastContainer" class="toast-container"></div>
-    <script src="app.js"></script>
-    <script>
-        let course = null, isFavorite = false, isPurchased = false;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            updateNavbar();
-            const id = new URLSearchParams(window.location.search).get('id');
-            if (!id) { window.location.href = 'hub.html'; return; }
-            await loadCourse(id);
-        });
-
-        function updateNavbar() {
-            const user = JSON.parse(localStorage.getItem('user'));
-            document.getElementById('navbarUser').innerHTML = user
-                ? `<a href="dashboard.html"><button class="btn btn-sm" style="background:var(--secondary);color:white;width:40px;height:40px;border-radius:50%;font-weight:700;cursor:pointer;">${user.username.charAt(0).toUpperCase()}</button></a>`
-                : `<a href="login.html" class="btn btn-secondary btn-sm">Log in</a><a href="login.html" class="btn btn-dark btn-sm">Sign up</a>`;
-        }
-
-        async function loadCourse(id) {
-            try {
-                const res = await api.getCourse(id);
-                if (!res.success) { showToast('Course not found', 'error'); window.location.href = 'hub.html'; return; }
-                course = res.course;
-
-                // Check if purchased from database
-                if (localStorage.getItem('token')) {
-                    try {
-                        const [favRes, purchRes] = await Promise.all([
-                            api.getMyFavoriteIds(),
-                            api.getMyPurchaseIds()
-                        ]);
-                        if (favRes.success) isFavorite = favRes.favoriteIds.includes(parseInt(id));
-                        if (purchRes.success) isPurchased = purchRes.purchaseIds.includes(parseInt(id));
-                    } catch (e) { }
-                }
-
-                renderCourse();
-                document.getElementById('loadingState').style.display = 'none';
-                document.getElementById('courseContent').style.display = 'block';
-                document.title = course.title + ' | knowway';
-            } catch (e) { showToast('Failed to load', 'error'); }
-        }
-
-        function renderCourse() {
-            const c = course;
-            const categoryLabel = { dev: 'Development', design: 'Design', marketing: 'Marketing' }[c.category] || c.category;
-
-            document.getElementById('breadcrumb').innerHTML = `<a href="hub.html">${formatCategory(c.category)}</a> > ${c.level}`;
-            document.getElementById('courseTitle').textContent = c.title;
-            document.getElementById('courseSubtitle').textContent = c.short_description || '';
-            document.getElementById('courseMeta').textContent = `${categoryLabel} · ${c.level} · ${c.duration || 0} hours`;
-            document.getElementById('instructorLink').textContent = c.author || 'Instructor';
-            document.getElementById('lastUpdated').textContent = 'Last updated ' + new Date(c.updated_at || c.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-            document.getElementById('language').textContent = 'English';
-            document.getElementById('courseImage').src = c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800';
-
-
-            // Price
-            const price = parseFloat(c.price);
-            const discountPrice = c.discount_price ? parseFloat(c.discount_price) : null;
-            if (price === 0) {
-                document.getElementById('currentPrice').textContent = 'Free';
-                document.getElementById('originalPrice').style.display = 'none';
-                document.getElementById('discountPercent').style.display = 'none';
-            } else if (discountPrice && discountPrice < price) {
-                document.getElementById('currentPrice').textContent = '$' + discountPrice.toFixed(2);
-                document.getElementById('originalPrice').textContent = '$' + price.toFixed(2);
-                document.getElementById('discountPercent').textContent = Math.round((1 - discountPrice / price) * 100) + '% off';
-            } else {
-                document.getElementById('currentPrice').textContent = '$' + price.toFixed(2);
-                document.getElementById('originalPrice').style.display = 'none';
-                document.getElementById('discountPercent').style.display = 'none';
-            }
-
-            // Features
-            document.getElementById('featureDuration').textContent = c.duration + ' hours on-demand video';
-            document.getElementById('featureLessons').textContent = (c.total_lessons || 10) + ' lessons';
-
-            // Buy button
-            updateBuyBtn();
-
-            // Wishlist
-            updateWishlistBtn();
-
-            // What you'll learn
-            if (c.what_you_learn) {
-                document.getElementById('whatYouLearn').innerHTML = c.what_you_learn.split('\n').filter(x => x.trim()).map(item => `<div class="what-learn-item">${escapeHtml(item)}</div>`).join('');
-            } else {
-                document.getElementById('whatYouLearn').innerHTML = '<div class="what-learn-item">Master the core concepts</div><div class="what-learn-item">Build real-world projects</div><div class="what-learn-item">Gain practical skills</div><div class="what-learn-item">Get certified</div>';
-            }
-
-            // Description
-            document.getElementById('description').textContent = c.description || 'This course covers all the essential topics you need to know. Learn from industry experts with practical, hands-on examples.';
-
-            // Requirements
-            if (c.requirements) {
-                document.getElementById('requirements').innerHTML = c.requirements.split('\n').filter(x => x.trim()).map(item => `<li>${escapeHtml(item)}</li>`).join('');
-            } else {
-                document.getElementById('requirements').innerHTML = '<li>No prior experience required</li><li>Basic computer skills</li><li>Willingness to learn</li>';
-            }
-
-            // Who is for
-            if (c.who_is_for) {
-                document.getElementById('whoIsFor').innerHTML = c.who_is_for.split('\n').filter(x => x.trim()).map(item => `<li>${escapeHtml(item)}</li>`).join('');
-            } else {
-                document.getElementById('whoIsFor').innerHTML = '<li>Beginners looking to learn this topic</li><li>Professionals wanting to expand their skills</li><li>Anyone interested in this field</li>';
-            }
-        }
-
-        function formatCategory(cat) {
-            return { dev: 'Development', design: 'Design', marketing: 'Marketing' }[cat] || cat;
-        }
-
-        function updateBuyBtn() {
-            const btn = document.getElementById('buyBtn');
-            if (isPurchased) {
-                btn.textContent = 'Go to course';
-                btn.style.background = 'var(--success)';
-            } else {
-                btn.textContent = 'Buy now';
-                btn.style.background = '';
-            }
-        }
-
-        function updateWishlistBtn() {
-            const btn = document.getElementById('wishlistBtn');
-            btn.textContent = isFavorite ? 'Wishlisted' : 'Add to Wishlist';
-            btn.style.background = isFavorite ? 'var(--secondary)' : '';
-            btn.style.color = isFavorite ? 'white' : '';
-        }
-
-        async function toggleWishlist() {
-            if (!localStorage.getItem('token')) { showToast('Please log in', 'error'); window.location.href = 'login.html'; return; }
-            try {
-                if (isFavorite) { await api.removeFavorite(course.id); isFavorite = false; showToast('Removed from wishlist'); }
-                else { await api.addFavorite(course.id); isFavorite = true; showToast('Added to wishlist'); }
-                updateWishlistBtn();
-            } catch (e) { showToast('Failed', 'error'); }
-        }
-
-        async function handleBuy() {
-            if (isPurchased) {
-                showToast('You already own this course');
-                return;
-            }
-            if (!localStorage.getItem('token')) {
-                showToast('Please log in to purchase', 'error');
-                window.location.href = 'login.html';
-                return;
-            }
-
-            const price = course.discount_price || course.price;
-            const priceText = parseFloat(price) === 0 ? 'Free' : '$' + parseFloat(price).toFixed(2);
-
-            if (confirm(`Enroll in "${course.title}" for ${priceText}?`)) {
-                const btn = document.getElementById('buyBtn');
-                btn.disabled = true;
-                btn.textContent = 'Processing...';
-
-                try {
-                    const res = await api.purchaseCourse(course.id);
-                    if (res.success) {
-                        isPurchased = true;
-                        updateBuyBtn();
-                        showToast('Successfully enrolled!');
-                    } else {
-                        showToast(res.message || 'Purchase failed', 'error');
-                        btn.textContent = 'Buy now';
-                    }
-                } catch (e) {
-                    showToast('Purchase failed', 'error');
-                    btn.textContent = 'Buy now';
-                }
-                btn.disabled = false;
-            }
-        }
-    </script>
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pages/course.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,128 @@
+/**
+ * Profile Page JavaScript
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+    updateNavbar();
+
+    if (!isAuthenticated()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    await loadUserProfile();
+    await loadDashboardData();
+});
+
+async function loadUserProfile() {
+    const user = getCurrentUser();
+    if (user) {
+        document.getElementById('profileAvatar').textContent = user.username.charAt(0).toUpperCase();
+        document.getElementById('profileName').textContent = user.username;
+        document.getElementById('profileEmail').textContent = user.email;
+
+        try {
+            const res = await api.getMyRole();
+            if (res.success) {
+                const role = res.role;
+                const badge = document.getElementById('roleBadge');
+                badge.className = 'role-badge ' + role;
+                badge.textContent = role === 'super_admin' ? 'Super Admin' : role === 'teacher' ? 'Teacher' : 'Learner';
+
+                if (role === 'super_admin') {
+                    document.getElementById('adminLink').style.display = 'inline-flex';
+                }
+
+                if (role === 'super_admin' || role === 'teacher') {
+                    document.getElementById('manageLink').style.display = 'inline-flex';
+                }
+
+                user.role = role;
+                localStorage.setItem('user', JSON.stringify(user));
+            }
+        } catch (e) { console.error(e); }
+    }
+}
+
+async function loadDashboardData() {
+    try {
+        const [purchasesRes, favoritesRes] = await Promise.all([
+            api.getMyPurchases(),
+            api.getMyFavorites()
+        ]);
+
+        if (purchasesRes.success) {
+            const purchases = purchasesRes.purchases;
+            document.getElementById('statEnrolled').textContent = purchases.length;
+
+            const completed = purchases.filter(p => p.progress === 100).length;
+            document.getElementById('statCompleted').textContent = completed;
+
+            const totalHours = purchases.reduce((sum, p) => sum + (p.duration || 0), 0);
+            document.getElementById('statHours').textContent = totalHours;
+
+            document.getElementById('statCertificates').textContent = completed;
+
+            renderProgressList(purchases.slice(0, 3));
+            renderRecentActivity(purchases);
+        }
+
+        if (favoritesRes.success) {
+            renderWishlist(favoritesRes.favorites.slice(0, 3));
+        }
+    } catch (e) { console.error(e); }
+}
+
+function renderProgressList(courses) {
+    const container = document.getElementById('progressList');
+    if (!courses.length) {
+        container.innerHTML = '<div class="empty-state"><p>No courses in progress</p></div>';
+        return;
+    }
+
+    container.innerHTML = courses.map(c => `
+        <div class="progress-item" onclick="window.location.href='course.html?id=${c.id}'">
+            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" class="progress-item-img">
+            <div class="progress-item-content">
+                <div class="progress-item-title">${escapeHtml(c.title)}</div>
+                <div class="progress-bar"><div class="progress-bar-fill" style="width:${c.progress || 0}%"></div></div>
+                <div class="progress-text">${c.progress || 0}% complete</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderWishlist(favorites) {
+    const container = document.getElementById('wishlistPreview');
+    if (!favorites.length) {
+        container.innerHTML = '<div class="empty-state"><p>No courses in wishlist</p></div>';
+        return;
+    }
+
+    container.innerHTML = favorites.map(c => `
+        <div class="progress-item" onclick="window.location.href='course.html?id=${c.id}'">
+            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" class="progress-item-img">
+            <div class="progress-item-content">
+                <div class="progress-item-title">${escapeHtml(c.title)}</div>
+                <div style="font-size:13px;color:var(--text-secondary)">${formatCategory(c.category)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderRecentActivity(purchases) {
+    const container = document.getElementById('activityList');
+    if (!purchases.length) {
+        container.innerHTML = '<div class="empty-state"><p>No recent activity</p></div>';
+        return;
+    }
+
+    container.innerHTML = purchases.slice(0, 4).map(p => `
+        <div class="activity-item">
+            <div class="activity-icon">📚</div>
+            <div class="activity-content">
+                <div class="activity-text">Enrolled in <strong>${escapeHtml(p.title)}</strong></div>
+                <div class="activity-time">${formatDate(p.purchased_at || p.created_at)}</div>
+            </div>
+        </div>
+    `).join('');
+}

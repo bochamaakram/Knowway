@@ -1,0 +1,243 @@
+/* Course Page Styles */
+.course-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 900px) {
+    .course-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.course-sidebar {
+    background: var(--mantle);
+    border-right: 1px solid var(--border-color);
+    padding: var(--space-lg);
+    overflow-y: auto;
+}
+
+.course-sidebar-header {
+    margin-bottom: var(--space-lg);
+}
+
+.course-sidebar-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.course-sidebar-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.lessons-nav {
+    list-style: none;
+}
+
+.lesson-nav-item {
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xs);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+}
+
+.lesson-nav-item:hover {
+    background: var(--surface0);
+}
+
+.lesson-nav-item.active {
+    background: var(--primary-light);
+    border-left: 3px solid var(--primary);
+}
+
+.lesson-nav-number {
+    font-weight: 600;
+    color: var(--text-muted);
+    min-width: 24px;
+}
+
+.lesson-nav-title {
+    font-size: 14px;
+    flex: 1;
+}
+
+.course-content {
+    padding: var(--space-xl);
+    overflow-y: auto;
+}
+
+.content-header {
+    max-width: 800px;
+    margin: 0 auto var(--space-xl);
+}
+
+.content-header h1 {
+    font-size: 28px;
+    margin-bottom: var(--space-sm);
+}
+
+.lesson-content {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.lesson-content h1 {
+    font-size: 28px;
+    margin-bottom: var(--space-lg);
+}
+
+.lesson-content h2 {
+    font-size: 22px;
+    margin: var(--space-xl) 0 var(--space-md);
+}
+
+.lesson-content h3 {
+    font-size: 18px;
+    margin: var(--space-lg) 0 var(--space-md);
+}
+
+.lesson-content p {
+    margin-bottom: var(--space-md);
+}
+
+.lesson-content img {
+    max-width: 100%;
+    border-radius: var(--radius-md);
+    margin: var(--space-lg) 0;
+}
+
+.lesson-content pre {
+    background: var(--crust);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: var(--space-md) 0;
+}
+
+.lesson-content code {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+}
+
+.lesson-content ul,
+.lesson-content ol {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-xl);
+}
+
+.lesson-content li {
+    margin-bottom: var(--space-sm);
+}
+
+.lesson-content blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: var(--space-md);
+    margin: var(--space-lg) 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.video-embed {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+    background: var(--crust);
+}
+
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    max-width: 800px;
+    margin: var(--space-2xl) auto 0;
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border-color);
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--surface0);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+    color: var(--text);
+}
+
+.nav-btn:hover {
+    background: var(--surface1);
+    border-color: var(--primary);
+}
+
+.nav-btn.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.nav-btn-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.nav-btn-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.course-overview {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.overview-section {
+    margin-bottom: var(--space-xl);
+}
+
+.overview-section h2 {
+    font-size: 20px;
+    margin-bottom: var(--space-md);
+}
+
+.enroll-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    margin-top: var(--space-xl);
+}
+
+.enroll-price {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.mobile-nav {
+    display: none;
+    background: var(--mantle);
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+@media (max-width: 900px) {
+    .course-sidebar {
+        display: none;
+    }
+
+    .mobile-nav {
+        display: block;
+    }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Courses | knowway</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/explore.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="learning.html" class="navbar-brand">knowway</a>
+            <div class="navbar-search">
+                <input type="text" id="searchInput" placeholder="Search courses...">
+            </div>
+            <ul class="navbar-nav">
+                <li><a href="explore.html" style="color:var(--primary)">Explore</a></li>
+                <li><a href="learning.html">My Learning</a></li>
+            </ul>
+            <div class="navbar-user" id="navbarUser"></div>
+        </div>
+    </nav>
+
+    <section class="search-section">
+        <div class="container">
+            <div class="filter-row">
+                <button class="filter-btn active" data-category="">All</button>
+                <button class="filter-btn" data-category="dev">Development</button>
+                <button class="filter-btn" data-category="design">Design</button>
+                <button class="filter-btn" data-category="marketing">Marketing</button>
+                <span style="margin-left:auto"></span>
+                <button class="filter-btn" data-level="">All Levels</button>
+                <button class="filter-btn" data-level="beginner">Beginner</button>
+                <button class="filter-btn" data-level="intermediate">Intermediate</button>
+                <button class="filter-btn" data-level="advanced">Advanced</button>
+            </div>
+        </div>
+    </section>
+
+    <main class="container" style="padding-top:var(--space-xl)">
+        <div id="loadingState" class="empty-state">
+            <div class="spinner"></div>
+        </div>
+
+        <p id="resultsCount" class="results-count">0 results</p>
+        <div id="coursesGrid" class="courses-grid"></div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <h3>No courses found</h3>
+            <p>Try adjusting your filters</p>
+        </div>
+
+        <div id="pagination" class="pagination hidden">
+            <button id="prevBtn" class="pagination-btn" onclick="changePage(-1)">←</button>
+            <span id="paginationInfo" class="pagination-info"></span>
+            <button id="nextBtn" class="pagination-btn" onclick="changePage(1)">→</button>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pages/explore.js"></script>
+</body>
+
+</html>

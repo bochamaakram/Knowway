@@ -19,6 +19,7 @@ app.use('/api/purchases', require('./server/routes/purchases'));
 app.use('/api/users', require('./server/routes/users'));
 app.use('/api/scraping', require('./server/routes/scraping'));
 app.use('/api/upload', require('./server/routes/upload'));
+app.use('/api/lessons', require('./server/routes/lessons'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));

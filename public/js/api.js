@@ -1,16 +1,25 @@
-// CourseManager - API Client & Utilities
-const API_BASE = 'http://localhost:3000/api';
-
-// API Client
+/**
+ * knowway API Client
+ * Handles all API communication with the backend
+ */
 const api = {
-    // Helper for fetch requests
-    async request(endpoint, options = {}) {
+    baseUrl: '/api',
+
+    /**
+     * Make an authenticated API request
+     */
+    request: async (endpoint, options = {}) => {
         const token = localStorage.getItem('token');
-        const headers = { 'Content-Type': 'application/json', ...options.headers };
+        const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
-        return res.json();
+        try {
+            const response = await fetch(api.baseUrl + endpoint, { ...options, headers: { ...headers, ...options.headers } });
+            return response.json();
+        } catch (err) {
+            console.error('API Error:', err);
+            return { success: false, message: 'Network error' };
+        }
     },
 
     // Auth
@@ -19,10 +28,7 @@ const api = {
     getMe: () => api.request('/auth/me'),
 
     // Courses
-    getCourses: (params = {}) => {
-        const query = new URLSearchParams(params).toString();
-        return api.request(`/courses${query ? '?' + query : ''}`);
-    },
+    getCourses: (params = {}) => api.request('/courses?' + new URLSearchParams(params)),
     getCourse: (id) => api.request(`/courses/${id}`),
     createCourse: (data) => api.request('/courses', { method: 'POST', body: JSON.stringify(data) }),
     updateCourse: (id, data) => api.request(`/courses/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -38,7 +44,6 @@ const api = {
     purchaseCourse: (courseId) => api.request(`/purchases/${courseId}`, { method: 'POST' }),
     getMyPurchases: () => api.request('/purchases/my-purchases'),
     getMyPurchaseIds: () => api.request('/purchases/my-purchase-ids'),
-    updateProgress: (courseId, progress) => api.request(`/purchases/${courseId}/progress`, { method: 'PUT', body: JSON.stringify({ progress }) }),
 
     // Users (Admin)
     getAllUsers: () => api.request('/users'),
@@ -61,45 +66,12 @@ const api = {
             body: formData
         });
         return response.json();
-    }
+    },
+
+    // Lessons
+    getLessons: (courseId) => api.request(`/lessons/course/${courseId}`),
+    getLesson: (id) => api.request(`/lessons/${id}`),
+    createLesson: (data) => api.request('/lessons', { method: 'POST', body: JSON.stringify(data) }),
+    updateLesson: (id, data) => api.request(`/lessons/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteLesson: (id) => api.request(`/lessons/${id}`, { method: 'DELETE' })
 };
-
-// Toast Notification
-function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span><span>${message}</span>`;
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// Debounce utility
-function debounce(fn, ms) {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fn(...args), ms);
-    };
-}
-
-// Escape HTML for security
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text || '';
-    return div.innerHTML;
-}
-
-// Logout
-function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
-}
