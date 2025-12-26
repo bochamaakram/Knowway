@@ -77,6 +77,18 @@
     background: transparent;
 }
 
+.lesson-nav-item.completed .lesson-nav-number {
+    color: var(--green);
+    font-weight: 700;
+}
+
+.lesson-complete-section {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+}
+
 .course-content {
     padding: var(--space-xl);
     overflow-y: auto;

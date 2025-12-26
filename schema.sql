@@ -102,6 +102,24 @@ CREATE TABLE course_lessons (
 CREATE INDEX idx_lessons_course ON course_lessons(course_id);
 CREATE INDEX idx_lessons_order ON course_lessons(course_id, order_index);
 
+-- Lesson Progress (tracking user progress through lessons)
+CREATE TABLE lesson_progress (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    lesson_id INT NOT NULL,
+    course_id INT NOT NULL,
+    completed BOOLEAN DEFAULT FALSE,
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES course_lessons(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_lesson (user_id, lesson_id)
+);
+
+CREATE INDEX idx_progress_user ON lesson_progress(user_id);
+CREATE INDEX idx_progress_course ON lesson_progress(user_id, course_id);
+
 SELECT 'Schema created successfully!' as message;
 
 

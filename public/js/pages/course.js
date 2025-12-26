@@ -5,6 +5,7 @@ let course = null;
 let lessons = [];
 let currentLesson = null;
 let isPurchased = false;
+let completedLessonIds = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     updateNavbar();
@@ -30,12 +31,19 @@ async function loadCourse() {
             try {
                 const purchRes = await api.getMyPurchaseIds();
                 if (purchRes.success) isPurchased = purchRes.purchaseIds.includes(parseInt(courseId));
+
+                if (isPurchased) {
+                    const progressRes = await api.getCourseProgress(courseId);
+                    if (progressRes.success) {
+                        completedLessonIds = progressRes.progress.completedLessonIds;
+                    }
+                }
             } catch (e) { }
         }
 
         renderSidebar();
 
-        if (lessonId && lessons.length > 0) {
+        if (lessonId && lessons.length > 0 && isPurchased) {
             await loadLesson(parseInt(lessonId));
         } else {
             renderOverview();
@@ -52,7 +60,15 @@ async function loadCourse() {
 
 function renderSidebar() {
     document.getElementById('sidebarTitle').textContent = course.title;
-    document.getElementById('sidebarMeta').textContent = `${lessons.length} lessons`;
+
+    const completedCount = completedLessonIds.length;
+    const totalLessons = lessons.length;
+    const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+    document.getElementById('sidebarMeta').innerHTML = isPurchased && totalLessons > 0
+        ? `<div style="margin-bottom:8px">${completedCount}/${totalLessons} lessons completed</div>
+           <div class="progress-bar" style="height:4px"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>`
+        : `${totalLessons} lessons`;
 
     const nav = document.getElementById('lessonsNav');
     nav.innerHTML = `
@@ -60,19 +76,23 @@ function renderSidebar() {
             <span class="lesson-nav-number">📖</span>
             <span class="lesson-nav-title">Course Overview</span>
         </li>
-    ` + lessons.map((l, i) => `
-        <li class="lesson-nav-item ${currentLesson?.id === l.id ? 'active' : ''} ${!isPurchased ? 'locked' : ''}" 
+    ` + lessons.map((l, i) => {
+        const isCompleted = completedLessonIds.includes(l.id);
+        const isLocked = !isPurchased;
+        return `
+        <li class="lesson-nav-item ${currentLesson?.id === l.id ? 'active' : ''} ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}" 
             onclick="${isPurchased ? `navigateToLesson(${l.id})` : 'showEnrollPrompt()'}">
-            <span class="lesson-nav-number">${isPurchased ? i + 1 : '🔒'}</span>
+            <span class="lesson-nav-number">${isLocked ? '🔒' : isCompleted ? '✓' : i + 1}</span>
             <span class="lesson-nav-title">${escapeHtml(l.title)}</span>
-        </li>
-    `).join('');
+        </li>`;
+    }).join('');
 
     document.getElementById('mobileSelect').innerHTML = `
         <option value="">Course Overview</option>
-    ` + lessons.map((l, i) => `
-        <option value="${isPurchased ? l.id : ''}" ${currentLesson?.id === l.id ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${i + 1}. ${l.title}${!isPurchased ? ' 🔒' : ''}</option>
-    `).join('');
+    ` + lessons.map((l, i) => {
+        const isCompleted = completedLessonIds.includes(l.id);
+        return `<option value="${isPurchased ? l.id : ''}" ${currentLesson?.id === l.id ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${isCompleted ? '✓ ' : ''}${i + 1}. ${l.title}${!isPurchased ? ' 🔒' : ''}</option>`;
+    }).join('');
 
     updateEnrollButton();
 }
@@ -125,9 +145,15 @@ async function loadLesson(lessonId) {
             videoContainer.innerHTML = '';
         }
 
+        const isCompleted = completedLessonIds.includes(currentLesson.id);
         document.getElementById('lessonBody').innerHTML = `
             <h1>${escapeHtml(currentLesson.title)}</h1>
             ${parseMarkdown(currentLesson.content || '')}
+            <div class="lesson-complete-section">
+                <button id="completeBtn" class="btn ${isCompleted ? 'btn-secondary' : 'btn-primary'}" onclick="toggleLessonComplete()">
+                    ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
+                </button>
+            </div>
         `;
 
         const prevBtn = document.getElementById('prevBtn');
@@ -156,6 +182,39 @@ async function loadLesson(lessonId) {
     } catch (e) { showToast('Error loading lesson', 'error'); }
 }
 
+async function toggleLessonComplete() {
+    if (!currentLesson) return;
+
+    const isCompleted = completedLessonIds.includes(currentLesson.id);
+    const btn = document.getElementById('completeBtn');
+    btn.disabled = true;
+
+    try {
+        let res;
+        if (isCompleted) {
+            res = await api.markLessonIncomplete(currentLesson.id);
+            if (res.success) {
+                completedLessonIds = completedLessonIds.filter(id => id !== currentLesson.id);
+                btn.textContent = 'Mark as Complete';
+                btn.className = 'btn btn-primary';
+            }
+        } else {
+            res = await api.markLessonComplete(currentLesson.id);
+            if (res.success) {
+                completedLessonIds.push(currentLesson.id);
+                btn.textContent = '✓ Completed';
+                btn.className = 'btn btn-secondary';
+                showToast('Lesson completed!');
+            }
+        }
+        renderSidebar();
+    } catch (e) {
+        showToast('Error updating progress', 'error');
+    }
+
+    btn.disabled = false;
+}
+
 function navigateToLesson(lessonId) {
     if (!lessonId) { showOverview(); return; }
     if (!isPurchased) {
@@ -176,16 +235,18 @@ function updateEnrollButton() {
     const mainBtn = document.getElementById('mainEnrollBtn');
 
     if (isPurchased) {
-        btn.textContent = lessons.length ? 'Start Learning' : 'Enrolled ✓';
-        btn.onclick = () => { if (lessons.length) navigateToLesson(lessons[0].id); };
-        mainBtn.textContent = lessons.length ? 'Start Learning' : 'Enrolled ✓';
-        mainBtn.onclick = () => { if (lessons.length) navigateToLesson(lessons[0].id); };
+        const nextLesson = lessons.find(l => !completedLessonIds.includes(l.id)) || lessons[0];
+        btn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled ✓';
+        btn.onclick = () => { if (nextLesson) navigateToLesson(nextLesson.id); };
+        mainBtn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled ✓';
+        mainBtn.onclick = () => { if (nextLesson) navigateToLesson(nextLesson.id); };
     }
 }
 
 async function handleEnroll() {
     if (isPurchased) {
-        if (lessons.length) navigateToLesson(lessons[0].id);
+        const nextLesson = lessons.find(l => !completedLessonIds.includes(l.id)) || lessons[0];
+        if (nextLesson) navigateToLesson(nextLesson.id);
         return;
     }
     if (!isAuthenticated()) {
@@ -199,6 +260,7 @@ async function handleEnroll() {
         if (res.success) {
             isPurchased = true;
             updateEnrollButton();
+            renderSidebar();
             showToast('Enrolled successfully!');
         } else {
             showToast(res.message || 'Failed to enroll', 'error');
@@ -209,6 +271,6 @@ async function handleEnroll() {
 window.onpopstate = () => {
     const params = new URLSearchParams(window.location.search);
     const lessonId = params.get('lesson');
-    if (lessonId) loadLesson(parseInt(lessonId));
+    if (lessonId && isPurchased) loadLesson(parseInt(lessonId));
     else renderOverview();
 };

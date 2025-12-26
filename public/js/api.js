@@ -73,5 +73,10 @@ const api = {
     getLesson: (id) => api.request(`/lessons/${id}`),
     createLesson: (data) => api.request('/lessons', { method: 'POST', body: JSON.stringify(data) }),
     updateLesson: (id, data) => api.request(`/lessons/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-    deleteLesson: (id) => api.request(`/lessons/${id}`, { method: 'DELETE' })
+    deleteLesson: (id) => api.request(`/lessons/${id}`, { method: 'DELETE' }),
+
+    // Progress
+    getCourseProgress: (courseId) => api.request(`/progress/course/${courseId}`),
+    markLessonComplete: (lessonId) => api.request(`/progress/lesson/${lessonId}/complete`, { method: 'POST' }),
+    markLessonIncomplete: (lessonId) => api.request(`/progress/lesson/${lessonId}/complete`, { method: 'DELETE' })
 };
