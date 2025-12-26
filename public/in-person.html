@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In-Person Courses | knowway</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/in-person.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="learning.html" class="navbar-brand">knowway</a>
+            <ul class="navbar-nav">
+                <li><a href="explore.html">Explore</a></li>
+                <li><a href="in-person.html" style="color:var(--primary)">In-Person</a></li>
+                <li><a href="learning.html">My Learning</a></li>
+            </ul>
+            <div class="navbar-user" id="navbarUser"></div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">🏢 Local Learning</span>
+                <h1 class="hero-title">Find In-Person Courses Near You</h1>
+                <p class="hero-subtitle">Discover training centers, workshops, and educational institutions in your city
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="search-section">
+        <div class="container">
+            <form id="searchForm" class="search-form">
+                <div class="search-card">
+                    <div class="search-inputs">
+                        <div class="input-group">
+                            <label for="keyword">What do you want to learn?</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔍</span>
+                                <input type="text" id="keyword" name="keyword"
+                                    placeholder="e.g., Web Development, Photography, Languages..." required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="city">Where?</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📍</span>
+                                <input type="text" id="city" name="city"
+                                    placeholder="e.g., Marrakesh, Casablanca, Rabat..." required>
+                            </div>
+                        </div>
+                        <button type="submit" class="search-btn" id="searchBtn">
+                            <span class="btn-text">Search Places</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                    </div>
+                    <div class="quick-tags">
+                        <span class="tag-label">Popular:</span>
+                        <button type="button" class="quick-tag" data-keyword="programming courses">Programming</button>
+                        <button type="button" class="quick-tag" data-keyword="language school">Languages</button>
+                        <button type="button" class="quick-tag" data-keyword="design training">Design</button>
+                        <button type="button" class="quick-tag" data-keyword="co-working space">Co-working</button>
+                        <button type="button" class="quick-tag" data-keyword="music lessons">Music</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <main class="container results-section">
+        <div id="loadingState" class="loading-state hidden">
+            <div class="loader">
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+            </div>
+            <p>Searching for places...</p>
+        </div>
+
+        <div id="resultsHeader" class="results-header hidden">
+            <h2 id="resultsTitle">Results</h2>
+            <span id="resultsCount" class="results-count">0 places found</span>
+        </div>
+
+        <div id="placesGrid" class="places-grid"></div>
+
+        <div id="emptyState" class="empty-state hidden">
+            <div class="empty-icon">🔍</div>
+            <h3>No places found</h3>
+            <p>Try searching with different keywords or another city</p>
+        </div>
+
+        <div id="initialState" class="initial-state">
+            <div class="initial-icon">🎓</div>
+            <h3>Ready to discover local learning opportunities?</h3>
+            <p>Enter what you want to learn and your city to find courses, training centers, and educational
+                institutions near you.</p>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pages/in-person.js"></script>
+</body>
+
+</html>
