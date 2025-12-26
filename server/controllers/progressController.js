@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../config/db');
 
 /**
  * Get user's progress for a course

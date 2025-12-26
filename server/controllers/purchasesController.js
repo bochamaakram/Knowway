@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../config/db');
 
 /**
  * Legacy purchase function - now redirects to points-based purchase

@@ -1,20 +1,16 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'course_management',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+// Support both DATABASE_URL (Supabase/Vercel) and individual env vars (local dev)
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
 // Test connection
-pool.getConnection()
-    .then(conn => {
+pool.connect()
+    .then(client => {
         console.log('✅ Database connected successfully');
-        conn.release();
+        client.release();
     })
     .catch(err => {
         console.error('❌ Database connection failed:', err.message);

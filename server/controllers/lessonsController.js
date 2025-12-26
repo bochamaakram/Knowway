@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../config/db');
 
 // Get all lessons for a course
 exports.getLessons = async (req, res) => {

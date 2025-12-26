@@ -1,0 +1,184 @@
+-- PostgreSQL Schema for Supabase
+-- Run this in Supabase SQL Editor
+
+-- Drop existing tables (if any)
+DROP TABLE IF EXISTS point_transactions CASCADE;
+DROP TABLE IF EXISTS quiz_attempts CASCADE;
+DROP TABLE IF EXISTS quiz_questions CASCADE;
+DROP TABLE IF EXISTS course_quizzes CASCADE;
+DROP TABLE IF EXISTS lesson_progress CASCADE;
+DROP TABLE IF EXISTS favorites CASCADE;
+DROP TABLE IF EXISTS purchases CASCADE;
+DROP TABLE IF EXISTS course_lessons CASCADE;
+DROP TABLE IF EXISTS scraped_data CASCADE;
+DROP TABLE IF EXISTS courses CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- Users table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'learner' CHECK (role IN ('super_admin', 'teacher', 'learner')),
+    points INTEGER DEFAULT 0,
+    avatar_url VARCHAR(500),
+    bio TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Courses table
+CREATE TABLE courses (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    short_description VARCHAR(500),
+    category VARCHAR(20) NOT NULL DEFAULT 'dev' CHECK (category IN ('dev', 'design', 'marketing')),
+    duration INTEGER NOT NULL DEFAULT 0,
+    is_free BOOLEAN DEFAULT TRUE,
+    point_cost INTEGER DEFAULT 0,
+    points_reward INTEGER DEFAULT 500,
+    level VARCHAR(20) NOT NULL DEFAULT 'beginner' CHECK (level IN ('beginner', 'intermediate', 'advanced')),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived', 'draft')),
+    image_url VARCHAR(500),
+    total_lessons INTEGER DEFAULT 0,
+    total_students INTEGER DEFAULT 0,
+    rating DECIMAL(2, 1) DEFAULT 0.0,
+    rating_count INTEGER DEFAULT 0,
+    requirements TEXT,
+    what_you_learn TEXT,
+    who_is_for TEXT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Favorites table
+CREATE TABLE favorites (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, course_id)
+);
+
+-- Purchases table
+CREATE TABLE purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    points_paid INTEGER NOT NULL DEFAULT 0,
+    progress INTEGER DEFAULT 0,
+    quiz_passed BOOLEAN DEFAULT FALSE,
+    quiz_score INTEGER DEFAULT 0,
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, course_id)
+);
+
+-- Course Lessons table
+CREATE TABLE course_lessons (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    video_url VARCHAR(500),
+    order_index INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Scraped data table
+CREATE TABLE scraped_data (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(500),
+    content TEXT,
+    source_url VARCHAR(1000),
+    category VARCHAR(100),
+    scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Lesson Progress table
+CREATE TABLE lesson_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INTEGER NOT NULL REFERENCES course_lessons(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    completed BOOLEAN DEFAULT FALSE,
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, lesson_id)
+);
+
+-- Course Quizzes table
+CREATE TABLE course_quizzes (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    title VARCHAR(255) DEFAULT 'Final Quiz',
+    passing_score INTEGER DEFAULT 85,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Quiz Questions table
+CREATE TABLE quiz_questions (
+    id SERIAL PRIMARY KEY,
+    quiz_id INTEGER NOT NULL REFERENCES course_quizzes(id) ON DELETE CASCADE,
+    question TEXT NOT NULL,
+    options JSONB NOT NULL,
+    correct_index INTEGER NOT NULL,
+    order_index INTEGER DEFAULT 0
+);
+
+-- Quiz Attempts table
+CREATE TABLE quiz_attempts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    quiz_id INTEGER NOT NULL REFERENCES course_quizzes(id) ON DELETE CASCADE,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    score INTEGER NOT NULL,
+    passed BOOLEAN DEFAULT FALSE,
+    answers JSONB,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Point Transactions table
+CREATE TABLE point_transactions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    amount INTEGER NOT NULL,
+    type VARCHAR(20) NOT NULL CHECK (type IN ('course_complete', 'course_purchase', 'bonus', 'refund')),
+    course_id INTEGER,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes
+CREATE INDEX idx_courses_user_id ON courses(user_id);
+CREATE INDEX idx_courses_status ON courses(status);
+CREATE INDEX idx_courses_category ON courses(category);
+CREATE INDEX idx_purchases_user_id ON purchases(user_id);
+CREATE INDEX idx_scraped_user ON scraped_data(user_id);
+CREATE INDEX idx_scraped_category ON scraped_data(category);
+CREATE INDEX idx_lessons_course ON course_lessons(course_id);
+CREATE INDEX idx_lessons_order ON course_lessons(course_id, order_index);
+CREATE INDEX idx_progress_user ON lesson_progress(user_id);
+CREATE INDEX idx_progress_course ON lesson_progress(user_id, course_id);
+CREATE INDEX idx_quiz_course ON course_quizzes(course_id);
+CREATE INDEX idx_questions_quiz ON quiz_questions(quiz_id);
+CREATE INDEX idx_attempts_user ON quiz_attempts(user_id);
+CREATE INDEX idx_transactions_user ON point_transactions(user_id);
+
+-- Function to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Triggers for updated_at
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_courses_updated_at BEFORE UPDATE ON courses FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_lessons_updated_at BEFORE UPDATE ON course_lessons FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

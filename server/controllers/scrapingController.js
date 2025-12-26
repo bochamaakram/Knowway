@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../config/db');
 
 // Trigger n8n scraping webhook (auth required)
 exports.triggerScraping = async (req, res) => {

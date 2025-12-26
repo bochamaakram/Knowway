@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../config/db');
 
 // Helper: Check if user ID 1 is super_admin
 const isSuperAdmin = (userId) => parseInt(userId) === 1;
