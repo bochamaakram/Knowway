@@ -21,28 +21,12 @@ const quickTags = document.querySelectorAll('.quick-tag');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    initNavbar();
+    updateNavbar(); // Use shared function from utils.js
     initQuickTags();
 
     // Handle form submission
     searchForm.addEventListener('submit', handleSearch);
 });
-
-// Initialize navbar user
-function initNavbar() {
-    const navbarUser = document.getElementById('navbarUser');
-    const token = localStorage.getItem('token');
-
-    if (token) {
-        navbarUser.innerHTML = `
-            <a href="profile.html" class="user-avatar" title="Profile">👤</a>
-        `;
-    } else {
-        navbarUser.innerHTML = `
-            <a href="login.html" class="btn btn-outline">Login</a>
-        `;
-    }
-}
 
 // Quick tags handler
 function initQuickTags() {
@@ -119,22 +103,22 @@ function displayResults(places, keyword, city) {
 function createPlaceCard(place) {
     const rating = place.rating ? `
         <div class="place-rating">
-            <span class="star">★</span>
+            <span class="star icon-star"></span>
             <span>${place.rating}</span>
         </div>
         <span class="place-reviews">(${place.reviews || 0} reviews)</span>
     ` : '';
 
     const thumbnail = place.thumbnail
-        ? `<img src="${place.thumbnail}" alt="${place.title}" class="place-thumbnail" onerror="this.outerHTML='<div class=\\'place-no-image\\'>🏢</div>'">`
-        : `<div class="place-no-image">🏢</div>`;
+        ? `<img src="${place.thumbnail}" alt="${place.title}" class="place-thumbnail" onerror="this.outerHTML='<div class=\\'place-no-image icon-building icon-2xl\\'></div>'">`
+        : `<div class="place-no-image icon-building icon-2xl"></div>`;
 
     const phoneBtn = place.phone
-        ? `<a href="tel:${place.phone}" class="place-action-btn phone-btn">📞 Call</a>`
+        ? `<a href="tel:${place.phone}" class="place-action-btn phone-btn"><span class="icon-phone"></span> Call</a>`
         : '';
 
     const websiteBtn = place.website
-        ? `<a href="${place.website}" target="_blank" class="place-action-btn">🌐 Website</a>`
+        ? `<a href="${place.website}" target="_blank" class="place-action-btn"><span class="icon-globe"></span> Website</a>`
         : '';
 
     return `
@@ -144,7 +128,7 @@ function createPlaceCard(place) {
                 ${place.type ? `<span class="place-type">${place.type}</span>` : ''}
                 <h3 class="place-title">${escapeHtml(place.title)}</h3>
                 <div class="place-address">
-                    <span class="place-address-icon">📍</span>
+                    <span class="place-address-icon icon-location"></span>
                     <span>${escapeHtml(place.address || 'Address not available')}</span>
                 </div>
                 <div class="place-meta">

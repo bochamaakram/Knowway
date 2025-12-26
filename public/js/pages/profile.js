@@ -118,7 +118,7 @@ function renderRecentActivity(purchases) {
 
     container.innerHTML = purchases.slice(0, 4).map(p => `
         <div class="activity-item">
-            <div class="activity-icon">📚</div>
+            <div class="activity-icon icon-books"></div>
             <div class="activity-content">
                 <div class="activity-text">Enrolled in <strong>${escapeHtml(p.title)}</strong></div>
                 <div class="activity-time">${formatDate(p.purchased_at || p.created_at)}</div>

@@ -90,7 +90,7 @@ function renderSidebar() {
     const nav = document.getElementById('lessonsNav');
     let navHtml = `
         <li class="lesson-nav-item ${!currentLesson && !document.getElementById('quizContent')?.style.display?.includes('block') ? 'active' : ''}" onclick="showOverview()">
-            <span class="lesson-nav-number">📖</span>
+            <span class="lesson-nav-number icon-book"></span>
             <span class="lesson-nav-title">Course Overview</span>
         </li>
     `;
@@ -101,7 +101,7 @@ function renderSidebar() {
         return `
         <li class="lesson-nav-item ${currentLesson?.id === l.id ? 'active' : ''} ${isLocked ? 'locked' : ''} ${isCompleted ? 'completed' : ''}" 
             onclick="${isPurchased ? `navigateToLesson(${l.id})` : 'showEnrollPrompt()'}">
-            <span class="lesson-nav-number">${isLocked ? '🔒' : isCompleted ? '✓' : i + 1}</span>
+            <span class="lesson-nav-number">${isLocked ? '<span class="icon-lock"></span>' : isCompleted ? '<span class="icon-check"></span>' : i + 1}</span>
             <span class="lesson-nav-title">${escapeHtml(l.title)}</span>
         </li>`;
     }).join('');
@@ -112,7 +112,7 @@ function renderSidebar() {
         navHtml += `
         <li class="lesson-nav-item quiz-link ${!isPurchased ? 'locked' : ''}" 
             onclick="${isPurchased && allLessonsComplete ? 'showQuizSection()' : isPurchased ? 'showNeedAllLessons()' : 'showEnrollPrompt()'}">
-            <span class="lesson-nav-number">${quizPassed ? '✓' : '📝'}</span>
+            <span class="lesson-nav-number">${quizPassed ? '<span class="icon-check"></span>' : '<span class="icon-quiz"></span>'}</span>
             <span class="lesson-nav-title">Final Quiz ${quizPassed ? '(Passed)' : ''}</span>
         </li>`;
     }
@@ -123,7 +123,7 @@ function renderSidebar() {
         <option value="">Course Overview</option>
     ` + lessons.map((l, i) => {
         const isCompleted = completedLessonIds.includes(l.id);
-        return `<option value="${isPurchased ? l.id : ''}" ${currentLesson?.id === l.id ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${isCompleted ? '✓ ' : ''}${i + 1}. ${l.title}${!isPurchased ? ' 🔒' : ''}</option>`;
+        return `<option value="${isPurchased ? l.id : ''}" ${currentLesson?.id === l.id ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${isCompleted ? '✓ ' : ''}${i + 1}. ${l.title}${!isPurchased ? ' [Locked]' : ''}</option>`;
     }).join('');
 
     updateEnrollButton();
@@ -189,7 +189,7 @@ async function loadLesson(lessonId) {
             ${parseMarkdown(currentLesson.content || '')}
             <div class="lesson-complete-section">
                 <button id="completeBtn" class="btn ${isCompleted ? 'btn-secondary' : 'btn-primary'}" onclick="toggleLessonComplete()">
-                    ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
+                    ${isCompleted ? 'Completed' : 'Mark as Complete'}
                 </button>
             </div>
         `;
@@ -240,7 +240,7 @@ async function toggleLessonComplete() {
             res = await api.markLessonComplete(currentLesson.id);
             if (res.success) {
                 completedLessonIds.push(currentLesson.id);
-                btn.textContent = '✓ Completed';
+                btn.textContent = 'Completed';
                 btn.className = 'btn btn-secondary';
                 showToast('Lesson completed!');
             }
@@ -278,16 +278,16 @@ function updateEnrollButton() {
 
     if (isPurchased) {
         if (quizPassed) {
-            btn.textContent = '✓ Course Completed';
+            btn.textContent = 'Course Completed';
             btn.disabled = true;
             btn.className = 'btn btn-success';
-            mainBtn.textContent = '✓ Course Completed';
+            mainBtn.textContent = 'Course Completed';
             mainBtn.className = 'btn btn-success btn-lg';
         } else {
             const nextLesson = lessons.find(l => !completedLessonIds.includes(l.id)) || lessons[0];
-            btn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled ✓';
+            btn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled';
             btn.onclick = () => { if (nextLesson) navigateToLesson(nextLesson.id); };
-            mainBtn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled ✓';
+            mainBtn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled';
             mainBtn.onclick = () => { if (nextLesson) navigateToLesson(nextLesson.id); };
         }
     } else {
@@ -396,11 +396,11 @@ async function submitQuiz() {
         resultEl.classList.add(res.passed ? 'passed' : 'failed');
 
         resultEl.innerHTML = `
-            <div class="quiz-result-icon">${res.passed ? '🎉' : '😔'}</div>
+            <div class="quiz-result-icon">${res.passed ? 'Congratulations!' : 'Keep trying!'}</div>
             <div class="quiz-result-score">${res.score}%</div>
             <div class="quiz-result-message">${res.message}</div>
             <div class="quiz-result-details">${res.correct} out of ${res.total} correct</div>
-            ${res.passed ? `<button class="btn btn-primary btn-lg" onclick="claimReward()" style="margin-top:var(--space-lg)">🎁 Claim Your Reward</button>` :
+            ${res.passed ? `<button class="btn btn-primary btn-lg" onclick="claimReward()" style="margin-top:var(--space-lg)">Claim Your Reward</button>` :
                 `<button class="btn btn-secondary" onclick="showQuizSection()" style="margin-top:var(--space-lg)">Try Again</button>`}
         `;
 
