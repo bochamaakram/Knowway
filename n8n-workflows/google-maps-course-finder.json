@@ -1,96 +1,27 @@
 {
-    "name": "Google Maps Course Finder",
     "nodes": [
         {
             "parameters": {},
-            "id": "trigger",
+            "id": "f6985a5a-33f2-4848-8575-c18528e6f8cc",
             "name": "Manual Trigger",
             "type": "n8n-nodes-base.manualTrigger",
             "typeVersion": 1,
             "position": [
-                240,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "values": {
-                    "string": [
-                        {
-                            "name": "query",
-                            "value": "training centers"
-                        },
-                        {
-                            "name": "location",
-                            "value": "New York, NY"
-                        },
-                        {
-                            "name": "serpapi_key",
-                            "value": "YOUR_SERPAPI_KEY_HERE"
-                        }
-                    ]
-                }
-            },
-            "id": "set_params",
-            "name": "Set Search Parameters",
-            "type": "n8n-nodes-base.set",
-            "typeVersion": 3.4,
-            "position": [
-                460,
-                300
-            ]
-        },
-        {
-            "parameters": {
-                "method": "GET",
-                "url": "=https://serpapi.com/search.json",
-                "sendQuery": true,
-                "queryParameters": {
-                    "parameters": [
-                        {
-                            "name": "engine",
-                            "value": "google_maps"
-                        },
-                        {
-                            "name": "q",
-                            "value": "={{ $json.query }}"
-                        },
-                        {
-                            "name": "ll",
-                            "value": "@40.7455096,-74.0083012,14z"
-                        },
-                        {
-                            "name": "type",
-                            "value": "search"
-                        },
-                        {
-                            "name": "api_key",
-                            "value": "={{ $json.serpapi_key }}"
-                        }
-                    ]
-                },
-                "options": {}
-            },
-            "id": "serpapi_request",
-            "name": "SerpAPI Google Maps",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.2,
-            "position": [
-                680,
-                300
+                912,
+                96
             ]
         },
         {
             "parameters": {
                 "jsCode": "// Extract local results from SerpAPI response\nconst results = $input.first().json.local_results || [];\n\nreturn results.map(place => ({\n  json: {\n    title: place.title,\n    address: place.address,\n    phone: place.phone || null,\n    website: place.website || null,\n    rating: place.rating || null,\n    reviews: place.reviews || 0,\n    type: place.type || null,\n    place_id: place.place_id,\n    gps_coordinates: place.gps_coordinates,\n    hours: place.hours || null,\n    thumbnail: place.thumbnail || null\n  }\n}));"
             },
-            "id": "extract_places",
-            "name": "Extract Places",
+            "id": "264d2106-eedc-4065-922e-6c6305e0b26e",
+            "name": "Extract Places1",
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
             "position": [
-                900,
-                300
+                1376,
+                304
             ]
         },
         {
@@ -117,46 +48,102 @@
                 },
                 "options": {}
             },
-            "id": "filter_results",
-            "name": "Filter Valid Places",
+            "id": "ec996df5-5c22-43c4-ad11-0494cc9faad3",
+            "name": "Filter Valid Places1",
             "type": "n8n-nodes-base.filter",
             "typeVersion": 2,
             "position": [
-                1120,
-                300
+                1584,
+                304
             ]
         },
         {
             "parameters": {
-                "method": "POST",
-                "url": "http://localhost:3000/api/scraping/receive",
-                "sendHeaders": true,
-                "headerParameters": {
-                    "parameters": [
+                "authentication": "queryAuth",
+                "url": "https://serpapi.com/search.json",
+                "options": {},
+                "queryParametersUi": {
+                    "parameter": [
                         {
-                            "name": "Content-Type",
-                            "value": "application/json"
+                            "name": "engine",
+                            "value": "google_maps"
+                        },
+                        {
+                            "name": "q",
+                            "value": "={{ $json.keyword }} in {{ $json.city }}"
+                        },
+                        {
+                            "name": "type",
+                            "value": "search"
                         }
                     ]
-                },
-                "sendBody": true,
-                "bodyParameters": {
-                    "parameters": [
+                }
+            },
+            "name": "SerpAPI Request1",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                1152,
+                304
+            ],
+            "id": "903e22f5-429a-4e9b-b95a-caf4fb01c51e",
+            "credentials": {
+                "httpQueryAuth": {
+                    "id": "L9Y5M4JdMqoZYI3E",
+                    "name": "Query Auth account 2"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "oAuth2",
+                "operation": "append",
+                "sheetId": "1ypqcc84g6NiqzNvXOvO95-O_ABAjCH5yXH3lVowObIw",
+                "range": "A:E",
+                "options": {}
+            },
+            "name": "Google Sheets",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                1792,
+                304
+            ],
+            "id": "338bde91-e518-44e3-b40e-9eb75ed26fa3",
+            "credentials": {
+                "googleSheetsOAuth2Api": {
+                    "id": "wgt41svRwRiew5Eu",
+                    "name": "Google Sheets account 6"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
                         {
-                            "name": "places",
-                            "value": "={{ $json }}"
+                            "id": "92967702-1b3c-48d5-8b1e-fa598afd702e",
+                            "name": "keyword",
+                            "value": "center de formation",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c8306026-66f8-4b72-9699-318e2467d013",
+                            "name": "city",
+                            "value": "Marrakesh",
+                            "type": "string"
                         }
                     ]
                 },
                 "options": {}
             },
-            "id": "send_to_app",
-            "name": "Send to App (Optional)",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.2,
+            "id": "71b81a34-1baf-457d-ba74-709c354280df",
+            "name": "Set Search Parameters",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
             "position": [
-                1340,
-                300
+                960,
+                304
             ]
         }
     ],
@@ -172,44 +159,44 @@
                 ]
             ]
         },
+        "Extract Places1": {
+            "main": [
+                [
+                    {
+                        "node": "Filter Valid Places1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter Valid Places1": {
+            "main": [
+                [
+                    {
+                        "node": "Google Sheets",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SerpAPI Request1": {
+            "main": [
+                [
+                    {
+                        "node": "Extract Places1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
         "Set Search Parameters": {
             "main": [
                 [
                     {
-                        "node": "SerpAPI Google Maps",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "SerpAPI Google Maps": {
-            "main": [
-                [
-                    {
-                        "node": "Extract Places",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Extract Places": {
-            "main": [
-                [
-                    {
-                        "node": "Filter Valid Places",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Filter Valid Places": {
-            "main": [
-                [
-                    {
-                        "node": "Send to App (Optional)",
+                        "node": "SerpAPI Request1",
                         "type": "main",
                         "index": 0
                     }
@@ -217,7 +204,9 @@
             ]
         }
     },
-    "settings": {
-        "executionOrder": "v1"
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "6fba02c56f732391825a81b0d3eb33212632413b406e8a0f3fe5b1cfa7369a99"
     }
 }
