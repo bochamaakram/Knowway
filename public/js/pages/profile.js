@@ -79,31 +79,36 @@ function renderProgressList(courses) {
         return;
     }
 
-    container.innerHTML = courses.map(c => `
-        <div class="progress-item" onclick="window.location.href='course.html?id=${c.id}'">
-            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" class="progress-item-img">
-            <div class="progress-item-content">
-                <div class="progress-item-title">${escapeHtml(c.title)}</div>
-                <div class="progress-bar"><div class="progress-bar-fill" style="width:${c.progress || 0}%"></div></div>
-                <div class="progress-text">${c.progress || 0}% complete</div>
+    container.innerHTML = courses.map(c => {
+        const progress = c.progress || 0;
+        return `
+        <div class="course-card-enrolled" onclick="window.location.href='course.html?id=${c.id}'">
+            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'">
+            <div class="course-card-enrolled-content">
+                <div class="course-card-enrolled-title">${escapeHtml(c.title)}</div>
+                <div class="course-card-enrolled-instructor">${escapeHtml(c.author || 'Instructor')} · ${formatCategory(c.category)}</div>
+                <div class="progress-container">
+                    <div class="progress-bar"><div class="progress-bar-fill" style="width:${progress}%"></div></div>
+                    <div class="progress-text">${progress}% complete</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function renderWishlist(favorites) {
     const container = document.getElementById('wishlistPreview');
     if (!favorites.length) {
-        container.innerHTML = '<div class="empty-state"><p>No courses in wishlist</p></div>';
+        container.innerHTML = '<div class="empty-state"><p>No courses in favorites</p></div>';
         return;
     }
 
     container.innerHTML = favorites.map(c => `
-        <div class="progress-item" onclick="window.location.href='course.html?id=${c.id}'">
-            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" class="progress-item-img">
-            <div class="progress-item-content">
-                <div class="progress-item-title">${escapeHtml(c.title)}</div>
-                <div style="font-size:13px;color:var(--text-secondary)">${formatCategory(c.category)}</div>
+        <div class="course-card-enrolled" onclick="window.location.href='course.html?id=${c.id}'">
+            <img src="${c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'}" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=200'">
+            <div class="course-card-enrolled-content">
+                <div class="course-card-enrolled-title">${escapeHtml(c.title)}</div>
+                <div class="course-card-enrolled-instructor">${escapeHtml(c.author || 'Instructor')} · ${formatCategory(c.category)}</div>
             </div>
         </div>
     `).join('');

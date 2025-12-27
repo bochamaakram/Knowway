@@ -7,7 +7,7 @@ let favoriteIds = [];
 let purchasedIds = [];
 let currentPage = 1;
 const limit = 6;
-let filters = { category: '', level: '', search: '' };
+let filters = { category: '', level: '', search: '', sort: 'newest' };
 
 document.addEventListener('DOMContentLoaded', async () => {
     updateNavbar();
@@ -33,25 +33,27 @@ function setupFilters() {
         applyFilters();
     }, 300));
 
-    document.querySelectorAll('.filter-btn[data-category]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn[data-category]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filters.category = btn.dataset.category;
-            currentPage = 1;
-            applyFilters();
-        });
+    document.getElementById('categoryFilter').addEventListener('change', e => {
+        filters.category = e.target.value;
+        currentPage = 1;
+        applyFilters();
     });
 
-    document.querySelectorAll('.filter-btn[data-level]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn[data-level]').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filters.level = btn.dataset.level;
-            currentPage = 1;
-            applyFilters();
-        });
+    document.getElementById('levelFilter').addEventListener('change', e => {
+        filters.level = e.target.value;
+        currentPage = 1;
+        applyFilters();
     });
+
+    document.getElementById('sortFilter').addEventListener('change', e => {
+        filters.sort = e.target.value;
+        applyFilters();
+    });
+
+    // Set initial values from URL params
+    if (filters.category) {
+        document.getElementById('categoryFilter').value = filters.category;
+    }
 }
 
 async function loadCourses() {
@@ -89,6 +91,15 @@ function applyFilters() {
         }
         return true;
     });
+
+    // Apply sorting
+    if (filters.sort === 'newest') {
+        filteredCourses.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (filters.sort === 'popular') {
+        filteredCourses.sort((a, b) => (b.enrollment_count || 0) - (a.enrollment_count || 0));
+    } else if (filters.sort === 'title') {
+        filteredCourses.sort((a, b) => a.title.localeCompare(b.title));
+    }
 
     document.getElementById('resultsCount').textContent = `${filteredCourses.length} results`;
     renderCourses();
@@ -170,7 +181,7 @@ async function toggleFavorite(id, btn) {
             favoriteIds.push(id);
             btn.innerHTML = '♥';
             btn.classList.add('active');
-            showToast('Added to wishlist');
+            showToast('Added to favorites');
         }
     } catch (e) {
         showToast('Failed', 'error');

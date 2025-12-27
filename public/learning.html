@@ -30,25 +30,27 @@
         </div>
     </section>
 
-    <main class="container">
-        <div class="filters-row">
-            <div class="search-box">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search my courses...">
+    <section class="search-section">
+        <div class="container">
+            <div class="filter-row">
+                <input type="text" id="searchInput" class="filter-search" placeholder="Search my courses...">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                    <option value="dev">Development</option>
+                    <option value="design">Design</option>
+                    <option value="marketing">Marketing</option>
+                </select>
+                <select id="progressFilter" class="filter-select">
+                    <option value="">All Progress</option>
+                    <option value="not-started">Not Started</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
             </div>
-            <select id="categoryFilter" class="form-control" style="width:auto">
-                <option value="">All Categories</option>
-                <option value="dev">Development</option>
-                <option value="design">Design</option>
-                <option value="marketing">Marketing</option>
-            </select>
-            <select id="progressFilter" class="form-control" style="width:auto">
-                <option value="">All Progress</option>
-                <option value="not-started">Not Started</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-            </select>
         </div>
+    </section>
 
+    <main class="container" style="padding-top:var(--space-xl)">
         <p id="resultsCount" class="results-count" style="display:none"></p>
         <div id="loadingState" class="empty-state">
             <div class="spinner"></div>

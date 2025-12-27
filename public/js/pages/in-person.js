@@ -3,7 +3,7 @@
  * Connects to n8n webhook for place search
  */
 
-const N8N_WEBHOOK_URL = 'https://n8n.zackdev.io/webhook-test/search-places';
+const N8N_WEBHOOK_URL = 'https://n8n.zackdev.io/webhook/search-places';
 
 // DOM Elements
 const searchForm = document.getElementById('searchForm');

@@ -246,15 +246,16 @@ h6 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-sm);
-    padding: 10px 20px;
-    font-size: 14px;
+    gap: 4px;
+    padding: 6px 14px;
+    font-size: 13px;
     font-weight: 600;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .btn:hover {
@@ -310,15 +311,13 @@ h6 {
 }
 
 .btn-sm {
-    padding: 6px 12px;
-    font-size: 13px;
-    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 11px;
 }
 
 .btn-lg {
-    padding: 14px 28px;
-    font-size: 16px;
-    border-radius: var(--radius-lg);
+    padding: 8px 18px;
+    font-size: 14px;
 }
 
 /* ===== Forms ===== */
@@ -369,6 +368,14 @@ select.form-control {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-md);
+}
+
+thead {
+    display: table-header-group;
+    vertical-align: middle;
+    unicode-bidi: isolate;
+    text-align: left;
+    border-color: inherit;
 }
 
 /* ===== Cards ===== */
@@ -472,8 +479,8 @@ select.form-control {
 
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-lg);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-md);
 }
 
 /* ===== Wishlist Button ===== */
@@ -521,37 +528,74 @@ select.form-control {
 
 .filter-row {
     display: flex;
-    gap: var(--space-sm);
-    flex-wrap: wrap;
+    gap: var(--space-md);
     align-items: center;
 }
 
-.filter-btn {
-    padding: 8px 16px;
-    font-size: 13px;
+.filter-select {
+    padding: 6px 28px 6px 10px;
+    font-size: clamp(11px, 1.4vw, 12px);
     font-weight: 500;
     background: var(--surface0);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition);
-    color: var(--text-secondary);
-}
-
-.filter-btn:hover {
-    background: var(--surface1);
     color: var(--text);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7086' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    min-width: 100px;
 }
 
-.filter-btn.active {
-    background: var(--primary);
-    color: var(--crust);
+.filter-select:hover {
     border-color: var(--primary);
+    background-color: var(--surface1);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.2);
+}
+
+.filter-search {
+    padding: 6px 10px 6px 28px;
+    font-size: clamp(11px, 1.4vw, 12px);
+    font-weight: 500;
+    background: var(--surface0);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    color: var(--text);
+    min-width: 150px;
+    flex: 1;
+    max-width: 250px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236c7086' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 8px center;
+}
+
+.filter-search:hover {
+    border-color: var(--primary);
+    background-color: var(--surface1);
+}
+
+.filter-search:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.2);
+}
+
+.filter-search::placeholder {
+    color: var(--text-muted);
 }
 
 .results-count {
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
     margin-bottom: var(--space-md);
 }
 
@@ -704,24 +748,27 @@ select.form-control {
     font-size: 13px;
 }
 
-/* ===== Progress Items ===== */
+/* ===== Progress Items - Simple rows ===== */
 .progress-item {
     display: flex;
     gap: var(--space-md);
-    padding: var(--space-md);
-    margin: 0 calc(-1 * var(--space-sm));
-    border-radius: var(--radius-md);
-    transition: all var(--transition);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition);
     cursor: pointer;
 }
 
 .progress-item:hover {
-    background: var(--surface1);
+    background: var(--surface0);
+}
+
+.progress-item:last-child {
+    border-bottom: none;
 }
 
 .progress-item-img {
-    width: 100px;
-    height: 56px;
+    width: 80px;
+    height: 45px;
     object-fit: cover;
     border-radius: var(--radius-sm);
     flex-shrink: 0;
@@ -729,13 +776,16 @@ select.form-control {
 
 .progress-item-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .progress-item-title {
     font-weight: 600;
-    margin-bottom: var(--space-sm);
+    margin-bottom: 2px;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 
 .progress-bar {
@@ -1176,45 +1226,68 @@ select.form-control {
 }
 
 /* ===== Enrolled Course Cards ===== */
+/* Course Row - Simple list item without card styling */
 .course-card-enrolled {
     display: flex;
     gap: var(--space-lg);
-    padding: var(--space-lg);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-md);
-    transition: all var(--transition);
+    padding: var(--space-md);
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition);
     cursor: pointer;
 }
 
 .course-card-enrolled:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    background: var(--surface0);
+}
+
+.course-card-enrolled:last-child {
+    border-bottom: none;
 }
 
 .course-card-enrolled img {
-    width: 180px;
-    height: 100px;
+    width: 120px;
+    height: 68px;
     object-fit: cover;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
 }
 
 .course-card-enrolled-content {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
 }
 
 .course-card-enrolled-title {
     font-size: 15px;
     font-weight: 600;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .course-card-enrolled-instructor {
     font-size: 13px;
     color: var(--text-secondary);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.progress-container {
+    width: 100%;
+}
+
+.progress-container .progress-bar {
+    height: 4px;
+    margin-bottom: 4px;
+}
+
+.progress-container .progress-text {
+    font-size: 12px;
+    color: var(--primary);
 }
 
 /* ===== Pagination ===== */
@@ -1444,6 +1517,10 @@ select.form-control {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .courses-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* Mobile */
@@ -1523,8 +1600,8 @@ select.form-control {
 
     /* Cards */
     .courses-grid {
-        grid-template-columns: 1fr;
-        gap: var(--space-md);
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
     }
 
     .card {
@@ -1535,16 +1612,15 @@ select.form-control {
         height: 120px;
     }
 
-    /* Course enrolled cards */
+    /* Course enrolled rows */
     .course-card-enrolled {
-        flex-direction: column;
         gap: var(--space-md);
-        padding: var(--space-md);
+        padding: var(--space-sm) var(--space-md);
     }
 
     .course-card-enrolled img {
-        width: 100%;
-        height: 140px;
+        width: 80px;
+        height: 45px;
     }
 
     /* Forms */
@@ -1558,16 +1634,15 @@ select.form-control {
         /* Prevents zoom on iOS */
     }
 
-    /* Buttons */
+    /* Buttons - Smaller on mobile */
     .btn {
-        padding: 12px 20px;
-        font-size: 14px;
+        padding: 4px 10px;
+        font-size: 11px;
     }
 
     .btn-lg {
-        padding: 14px 24px;
-        font-size: 15px;
-        width: 100%;
+        padding: 6px 14px;
+        font-size: 12px;
     }
 
     /* Profile */

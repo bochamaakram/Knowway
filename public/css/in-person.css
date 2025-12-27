@@ -3,7 +3,6 @@
 /* Search Section */
 .search-section {
     background: var(--mantle);
-    border-bottom: 1px solid var(--border-color);
     padding: var(--space-lg) 0;
 }
 
@@ -50,13 +49,15 @@
 
 .input-wrapper input {
     width: 100%;
-    padding: var(--space-md) var(--space-md) var(--space-md) calc(var(--space-md) + 30px);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    font-size: 16px;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 14px;
     background: var(--bg);
     color: var(--text);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    height: 44px;
+    box-sizing: border-box;
 }
 
 .input-wrapper input:focus {
@@ -72,18 +73,20 @@
 .search-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-sm);
-    padding: var(--space-md) var(--space-xl);
+    padding: 0 var(--space-xl);
     background: linear-gradient(135deg, var(--primary) 0%, #667eea 100%);
     color: white;
     border: none;
     border-radius: var(--radius-lg);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
-    height: 52px;
+    height: 44px;
+    min-width: 100px;
 }
 
 .search-btn:hover {
@@ -140,7 +143,8 @@
 
 /* Results Section */
 .results-section {
-    padding: var(--space-xl) 0 var(--space-3xl);
+    padding: var(--space-2xl) 0 var(--space-3xl);
+    padding-top: 20px;
 }
 
 .results-header {
@@ -164,36 +168,36 @@
     border: 1px solid var(--border-color);
 }
 
-/* Places List - Horizontal Row Cards (matches Learning page) */
+/* Places List - Simple rows without card styling */
 .places-grid {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
 }
 
-/* Place Card Row - matches .course-card-enrolled */
+/* Place Row - Simple list item */
 .place-card-row {
     display: flex;
     gap: var(--space-lg);
-    padding: var(--space-lg);
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    transition: all var(--transition);
+    padding: var(--space-md);
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition);
     cursor: pointer;
 }
 
 .place-card-row:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    border-color: var(--primary);
+    background: var(--surface0);
+}
+
+.place-card-row:last-child {
+    border-bottom: none;
 }
 
 .place-card-image {
-    width: 180px;
-    height: 100px;
+    width: 120px;
+    height: 68px;
     flex-shrink: 0;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     position: relative;
 }
@@ -207,7 +211,7 @@
 .place-card-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--surface1) 0%, var(--surface2) 100%);
+    background: var(--surface1);
     display: none;
     align-items: center;
     justify-content: center;
@@ -222,13 +226,14 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     min-width: 0;
 }
 
 .place-card-title {
     font-size: 15px;
     font-weight: 600;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 4px;
     color: var(--text);
     white-space: nowrap;
     overflow: hidden;
@@ -249,7 +254,6 @@
     align-items: center;
     gap: var(--space-md);
     font-size: 13px;
-    margin-bottom: var(--space-sm);
 }
 
 .place-rating {
@@ -276,7 +280,7 @@
 .place-card-actions {
     display: flex;
     gap: var(--space-sm);
-    margin-top: auto;
+    margin-top: var(--space-sm);
 }
 
 /* Loading State */
@@ -335,7 +339,7 @@
 .empty-state,
 .initial-state {
     text-align: center;
-    padding: var(--space-3xl) var(--space-xl);
+    padding: 20px;
     background: var(--bg-card);
     border-radius: var(--radius-xl);
     border: 2px dashed var(--border-color);
@@ -373,18 +377,22 @@
     }
 
     .place-card-row {
-        flex-direction: column;
         gap: var(--space-md);
+        padding: var(--space-sm) var(--space-md);
     }
 
     .place-card-image {
-        width: 100%;
-        height: 140px;
+        width: 80px;
+        height: 45px;
     }
 
     .results-header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-sm);
+    }
+
+    .place-card-actions {
+        display: none;
     }
 }
