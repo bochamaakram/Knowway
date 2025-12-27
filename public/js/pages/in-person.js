@@ -99,44 +99,42 @@ function displayResults(places, keyword, city) {
     placesGrid.innerHTML = places.map(place => createPlaceCard(place)).join('');
 }
 
-// Create place card HTML
+// Create place card HTML - matches Learning page card design
 function createPlaceCard(place) {
-    const rating = place.rating ? `
-        <div class="place-rating">
-            <span class="star icon-star"></span>
-            <span>${place.rating}</span>
-        </div>
-        <span class="place-reviews">(${place.reviews || 0} reviews)</span>
-    ` : '';
+    const rating = place.rating
+        ? `<span class="place-rating"><span class="icon-star"></span> ${place.rating}</span>`
+        : '';
 
-    const thumbnail = place.thumbnail
-        ? `<img src="${place.thumbnail}" alt="${place.title}" class="place-thumbnail" onerror="this.outerHTML='<div class=\\'place-no-image icon-building icon-2xl\\'></div>'">`
-        : `<div class="place-no-image icon-building icon-2xl"></div>`;
+    const reviews = place.reviews
+        ? `<span class="place-reviews">(${place.reviews} reviews)</span>`
+        : '';
 
     const phoneBtn = place.phone
-        ? `<a href="tel:${place.phone}" class="place-action-btn phone-btn"><span class="icon-phone"></span> Call</a>`
+        ? `<a href="tel:${place.phone}" class="btn btn-sm btn-secondary" onclick="event.stopPropagation()"><span class="icon-phone"></span> Call</a>`
         : '';
 
     const websiteBtn = place.website
-        ? `<a href="${place.website}" target="_blank" class="place-action-btn"><span class="icon-globe"></span> Website</a>`
+        ? `<a href="${place.website}" target="_blank" class="btn btn-sm btn-primary" onclick="event.stopPropagation()"><span class="icon-globe"></span> Website</a>`
         : '';
 
     return `
-        <div class="place-card">
-            ${thumbnail}
-            <div class="place-content">
-                ${place.type ? `<span class="place-type">${place.type}</span>` : ''}
-                <h3 class="place-title">${escapeHtml(place.title)}</h3>
-                <div class="place-address">
-                    <span class="place-address-icon icon-location"></span>
-                    <span>${escapeHtml(place.address || 'Address not available')}</span>
+        <div class="place-card-row" ${place.website ? `onclick="window.open('${place.website}', '_blank')"` : ''}>
+            <div class="place-card-image">
+                ${place.thumbnail
+            ? `<img src="${place.thumbnail}" alt="${escapeHtml(place.title)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">`
+            : ''}
+                <div class="place-card-placeholder ${place.thumbnail ? '' : 'show'}"><span class="icon-building icon-xl"></span></div>
+            </div>
+            <div class="place-card-content">
+                <div class="place-card-title">${escapeHtml(place.title)}</div>
+                <div class="place-card-address"><span class="icon-location"></span> ${escapeHtml(place.address || 'Address not available')}</div>
+                <div class="place-card-meta">
+                    ${rating}${reviews}
+                    ${place.type ? `<span class="place-type-badge">${escapeHtml(place.type)}</span>` : ''}
                 </div>
-                <div class="place-meta">
-                    ${rating}
-                    <div class="place-actions">
-                        ${phoneBtn}
-                        ${websiteBtn}
-                    </div>
+                <div class="place-card-actions">
+                    ${phoneBtn}
+                    ${websiteBtn}
                 </div>
             </div>
         </div>
