@@ -3,7 +3,7 @@
 
 -- Users (password: 123456 - bcrypt hash)
 INSERT INTO users (username, email, password, role, points) VALUES
-('admin', 'admin@knowway.com', '$2a$10$rDkPvvAFV8kqwevKYqNBNOVnHX7id8JKDj2Z5E5xRJxRJxRJxRJx6', 'super_admin', 5000),
+('admin', 'admin@knowway.com', '$2a$10$rDkPvvAFV8kqwevKYqNBNOVnHX7id8JKDj2Z5E5xRJxRJxRJxRJx6', 'teacher', 5000),
 ('john_teacher', 'john@knowway.com', '$2a$10$rDkPvvAFV8kqwevKYqNBNOVnHX7id8JKDj2Z5E5xRJxRJxRJxRJx6', 'teacher', 10000),
 ('sarah_teacher', 'sarah@knowway.com', '$2a$10$rDkPvvAFV8kqwevKYqNBNOVnHX7id8JKDj2Z5E5xRJxRJxRJxRJx6', 'teacher', 10000),
 ('mike_learner', 'mike@knowway.com', '$2a$10$rDkPvvAFV8kqwevKYqNBNOVnHX7id8JKDj2Z5E5xRJxRJxRJxRJx6', 'learner', 0)

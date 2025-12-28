@@ -153,6 +153,15 @@ CREATE TABLE point_transactions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Course Messages table (Chat)
+CREATE TABLE course_messages (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes
 CREATE INDEX idx_courses_user_id ON courses(user_id);
 CREATE INDEX idx_courses_status ON courses(status);
@@ -168,6 +177,7 @@ CREATE INDEX idx_quiz_course ON course_quizzes(course_id);
 CREATE INDEX idx_questions_quiz ON quiz_questions(quiz_id);
 CREATE INDEX idx_attempts_user ON quiz_attempts(user_id);
 CREATE INDEX idx_transactions_user ON point_transactions(user_id);
+CREATE INDEX idx_messages_course ON course_messages(course_id, created_at);
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

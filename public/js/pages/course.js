@@ -275,6 +275,29 @@ function showNeedAllLessons() {
 function updateEnrollButton() {
     const btn = document.getElementById('enrollBtn');
     const mainBtn = document.getElementById('mainEnrollBtn');
+    const chatBtn = document.getElementById('chatBtn');
+    const mobileBtn = document.getElementById('chatMobileBtn');
+
+    // Show/hide chat buttons based on enrollment
+    if (chatBtn) {
+        chatBtn.style.display = isPurchased ? 'flex' : 'none';
+    }
+    if (mobileBtn) {
+        mobileBtn.style.display = isPurchased ? '' : 'none';
+    }
+
+    // Start background message checking for notifications if enrolled
+    if (isPurchased && !chatRefreshInterval) {
+        // Initial load to get lastSeenMessageId
+        loadChatMessages();
+        // Check for new messages every 30 seconds (background)
+        setInterval(() => {
+            const panel = document.getElementById('chatPanel');
+            if (!panel.classList.contains('open')) {
+                loadChatMessages();
+            }
+        }, 30000);
+    }
 
     if (isPurchased) {
         if (quizPassed) {
@@ -442,3 +465,192 @@ window.onpopstate = () => {
     else if (lessonId && isPurchased) loadLesson(parseInt(lessonId));
     else renderOverview();
 };
+
+// ===== Chat Functionality =====
+let chatMessages = [];
+let chatRefreshInterval = null;
+let lastSeenMessageId = 0;
+let unreadCount = 0;
+
+// Get lastSeenMessageId from localStorage per course
+function getLastSeenMessageId() {
+    const stored = localStorage.getItem(`chat_seen_${course?.id}`);
+    return stored ? parseInt(stored) : 0;
+}
+
+// Save lastSeenMessageId to localStorage per course
+function saveLastSeenMessageId(id) {
+    if (course?.id) {
+        localStorage.setItem(`chat_seen_${course.id}`, id.toString());
+        lastSeenMessageId = id;
+    }
+}
+
+function toggleChat() {
+    const panel = document.getElementById('chatPanel');
+    const btn = document.getElementById('chatBtn');
+    const mobileBtn = document.getElementById('chatMobileBtn');
+
+    if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        if (btn) btn.classList.remove('active');
+        if (chatRefreshInterval) {
+            clearInterval(chatRefreshInterval);
+            chatRefreshInterval = null;
+        }
+    } else {
+        panel.classList.add('open');
+        if (btn) btn.classList.add('active');
+        // Clear notifications when opening
+        clearNotificationBadge();
+        loadChatMessages();
+        // Auto-refresh every 10 seconds
+        chatRefreshInterval = setInterval(loadChatMessages, 10000);
+    }
+}
+
+function clearNotificationBadge() {
+    unreadCount = 0;
+    const badge = document.querySelector('#chatBtn .chat-notification-badge');
+    const mobileBadge = document.getElementById('chatMobileBadge');
+    if (badge) badge.style.display = 'none';
+    if (mobileBadge) mobileBadge.style.display = 'none';
+    // Save last seen message to localStorage
+    if (chatMessages.length > 0) {
+        const maxId = Math.max(...chatMessages.map(m => m.id));
+        saveLastSeenMessageId(maxId);
+    }
+}
+
+function updateNotificationBadge(newCount) {
+    if (newCount <= 0) return;
+    unreadCount = newCount;
+
+    const btn = document.getElementById('chatBtn');
+    const mobileBadge = document.getElementById('chatMobileBadge');
+
+    // Add badge to sidebar button if it doesn't exist
+    if (btn && !btn.querySelector('.chat-notification-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'chat-notification-badge';
+        btn.appendChild(badge);
+    } else if (btn) {
+        const badge = btn.querySelector('.chat-notification-badge');
+        if (badge) {
+            badge.style.display = 'flex';
+        }
+    }
+
+    // Show mobile badge (just a dot)
+    if (mobileBadge) {
+        mobileBadge.textContent = '';
+        mobileBadge.style.display = 'flex';
+    }
+}
+
+function showMobileChatButton() {
+    const mobileBtn = document.getElementById('chatMobileBtn');
+    if (mobileBtn && isPurchased) {
+        mobileBtn.style.display = '';
+    }
+}
+
+async function loadChatMessages() {
+    if (!course || !isPurchased) return;
+
+    // Load lastSeenMessageId from localStorage on first call
+    if (lastSeenMessageId === 0) {
+        lastSeenMessageId = getLastSeenMessageId();
+    }
+
+    try {
+        const res = await api.getChatMessages(course.id);
+        if (res.success) {
+            chatMessages = res.messages;
+
+            // Check for new messages (only if chat is closed)
+            const panel = document.getElementById('chatPanel');
+            if (!panel.classList.contains('open') && chatMessages.length > 0) {
+                const newMessages = chatMessages.filter(m => m.id > lastSeenMessageId && !m.isOwn);
+                if (newMessages.length > 0) {
+                    updateNotificationBadge(newMessages.length);
+                }
+            } else if (panel.classList.contains('open') && chatMessages.length > 0) {
+                // Save last seen when chat is open
+                const maxId = Math.max(...chatMessages.map(m => m.id));
+                saveLastSeenMessageId(maxId);
+            }
+
+            renderChatMessages();
+        }
+    } catch (e) {
+        console.error('Error loading chat:', e);
+    }
+}
+
+function renderChatMessages() {
+    const container = document.getElementById('chatMessages');
+
+    if (chatMessages.length === 0) {
+        container.innerHTML = `
+            <div class="chat-empty">
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = chatMessages.map(m => {
+        const time = new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+            <div class="chat-message ${m.isOwn ? 'own' : 'other'}">
+                ${!m.isOwn ? `<div class="chat-message-header">
+                    <span class="chat-message-username">${escapeHtml(m.username)}</span>
+                    <span class="chat-message-time">${time}</span>
+                </div>` : ''}
+                <div class="chat-message-text">${escapeHtml(m.message)}</div>
+                ${m.isOwn ? `<div class="chat-message-time" style="text-align:right;margin-top:2px">${time}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    // Scroll to bottom
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+
+    if (!message || !course) return;
+
+    const btn = document.getElementById('chatSendBtn');
+    btn.disabled = true;
+
+    try {
+        const res = await api.sendChatMessage(course.id, message);
+        if (res.success) {
+            chatMessages.push(res.message);
+            renderChatMessages();
+            input.value = '';
+        } else {
+            showToast(res.message || 'Failed to send message', 'error');
+        }
+    } catch (e) {
+        showToast('Error sending message', 'error');
+    }
+
+    btn.disabled = false;
+}
+
+// Handle Enter key in chat input
+document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
+});

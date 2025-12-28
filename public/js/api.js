@@ -99,5 +99,9 @@ const api = {
     getQuiz: (courseId) => api.request(`/quiz/course/${courseId}`),
     submitQuiz: (quizId, answers) => api.request(`/quiz/${quizId}/submit`, { method: 'POST', body: JSON.stringify({ answers }) }),
     getQuizAttempts: (courseId) => api.request(`/quiz/attempts/${courseId}`),
-    saveQuiz: (courseId, data) => api.request(`/quiz/course/${courseId}`, { method: 'POST', body: JSON.stringify(data) })
+    saveQuiz: (courseId, data) => api.request(`/quiz/course/${courseId}`, { method: 'POST', body: JSON.stringify(data) }),
+
+    // Chat
+    getChatMessages: (courseId) => api.request(`/chat/${courseId}`),
+    sendChatMessage: (courseId, message) => api.request(`/chat/${courseId}`, { method: 'POST', body: JSON.stringify({ message }) })
 };

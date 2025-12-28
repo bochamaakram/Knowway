@@ -22,6 +22,7 @@ app.use('/api/lessons', require('./server/routes/lessons'));
 app.use('/api/progress', require('./server/routes/progress'));
 app.use('/api/points', require('./server/routes/points'));
 app.use('/api/quiz', require('./server/routes/quiz'));
+app.use('/api/chat', require('./server/routes/chat'));
 
 // Health check
 app.get('/api/health', (req, res) => {
