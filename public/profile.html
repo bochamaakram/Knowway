@@ -40,31 +40,27 @@
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-card-icon courses icon-books"></div>
-                <div class="stat-card-value" id="statEnrolled">0</div>
-                <div class="stat-card-label">Enrolled Courses</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon completed icon-check"></div>
-                <div class="stat-card-value" id="statCompleted">0</div>
-                <div class="stat-card-label">Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon hours icon-clock"></div>
-                <div class="stat-card-value" id="statHours">0</div>
-                <div class="stat-card-label">Hours Learned</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-icon certificates icon-trophy"></div>
-                <div class="stat-card-value" id="statCertificates">0</div>
-                <div class="stat-card-label">Certificates</div>
-            </div>
-        </div>
-
         <div class="dashboard-grid">
-            <div>
+            <!-- Left Column: Stats + Continue Learning + Activity -->
+            <div class="dashboard-left">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-icon courses icon-books"></div>
+                        <div class="stat-card-value" id="statEnrolled">0</div>
+                        <div class="stat-card-label">Enrolled Courses</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon completed icon-check"></div>
+                        <div class="stat-card-value" id="statCompleted">0</div>
+                        <div class="stat-card-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon hours icon-clock"></div>
+                        <div class="stat-card-value" id="statHours">0</div>
+                        <div class="stat-card-label">Hours Learned</div>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <div class="panel-header">
                         <h2 class="panel-title">Continue Learning</h2>
@@ -81,10 +77,11 @@
                 </div>
             </div>
 
-            <div>
+            <!-- Right Column: Favorites + Quick Actions -->
+            <div class="dashboard-right">
                 <div class="panel">
                     <div class="panel-header">
-                        <h2 class="panel-title">favorites</h2>
+                        <h2 class="panel-title">Favorites</h2>
                         <a href="explore.html" class="panel-link">Browse</a>
                     </div>
                     <div id="wishlistPreview"></div>

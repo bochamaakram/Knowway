@@ -19,18 +19,27 @@ exports.getCourseProgress = async (req, res) => {
             .eq('course_id', courseId)
             .eq('completed', true);
 
+        // Check if course is already completed (reward claimed)
+        const { data: purchase } = await supabase
+            .from('purchases')
+            .select('completed_at')
+            .eq('user_id', userId)
+            .eq('course_id', courseId)
+            .single();
+
         const completedLessonIds = progress?.map(p => p.lesson_id) || [];
         const totalLessons = lessons?.length || 0;
         const completedCount = completedLessonIds.length;
         const percentComplete = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+        const courseCompleted = !!purchase?.completed_at;
 
         res.json({
             success: true,
-            progress: { completedLessonIds, totalLessons, completedCount, percentComplete }
+            progress: { completedLessonIds, totalLessons, completedCount, percentComplete, courseCompleted }
         });
     } catch (err) {
         console.error('Get progress error:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Failed to get progress' });
     }
 };
 

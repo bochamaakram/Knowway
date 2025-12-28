@@ -51,35 +51,42 @@ exports.getLesson = async (req, res) => {
 exports.createLesson = async (req, res) => {
     try {
         const { course_id, title, content, video_url } = req.body;
+
         if (!course_id || !title) {
-            return res.status(400).json({ success: false, message: 'Course ID and title required' });
+            return res.status(400).json({ success: false, message: 'Course ID and title are required' });
         }
 
-        // Get max order
-        const { data: existing } = await supabase
+        // Get max order index for this course
+        const { data: existing, error: orderError } = await supabase
             .from('course_lessons')
             .select('order_index')
             .eq('course_id', course_id)
             .order('order_index', { ascending: false })
             .limit(1);
 
+        if (orderError) throw orderError;
+
         const nextOrder = existing && existing.length > 0 ? existing[0].order_index + 1 : 0;
 
+        // Insert the new lesson
         const { data, error } = await supabase
             .from('course_lessons')
-            .insert({ course_id, title, content: content || '', video_url: video_url || null, order_index: nextOrder })
+            .insert({
+                course_id,
+                title,
+                content: content || '',
+                video_url: video_url || null,
+                order_index: nextOrder
+            })
             .select('id')
             .single();
 
         if (error) throw error;
 
-        // Update total_lessons
-        await supabase.rpc('increment_total_lessons', { course_id_param: course_id }).catch(() => { });
-
-        res.status(201).json({ success: true, message: 'Lesson created', lessonId: data.id });
+        res.status(201).json({ success: true, message: 'Lesson created successfully', lessonId: data.id });
     } catch (err) {
         console.error('Create lesson error:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        res.status(500).json({ success: false, message: 'Failed to create lesson' });
     }
 };
 

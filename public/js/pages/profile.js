@@ -57,10 +57,14 @@ async function loadDashboardData() {
             const completed = purchases.filter(p => p.progress === 100).length;
             document.getElementById('statCompleted').textContent = completed;
 
-            const totalHours = purchases.reduce((sum, p) => sum + (p.duration || 0), 0);
-            document.getElementById('statHours').textContent = totalHours;
-
-            document.getElementById('statCertificates').textContent = completed;
+            // Calculate hours learned proportionally based on progress
+            // If course is 10h with 4 lessons and user completed 2, progress = 50%, hours = 5
+            const hoursLearned = purchases.reduce((sum, p) => {
+                const courseDuration = p.duration || 0;
+                const progressPercent = (p.progress || 0) / 100;
+                return sum + (courseDuration * progressPercent);
+            }, 0);
+            document.getElementById('statHours').textContent = hoursLearned.toFixed(1);
 
             renderProgressList(purchases.slice(0, 3));
             renderRecentActivity(purchases);

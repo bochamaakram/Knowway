@@ -9,6 +9,7 @@ let isPurchased = false;
 let completedLessonIds = [];
 let quiz = null;
 let quizPassed = false;
+let courseCompleted = false;  // Track if reward has been claimed
 let selectedAnswers = {};
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -45,6 +46,8 @@ async function loadCourse() {
                     const progressRes = await api.getCourseProgress(courseId);
                     if (progressRes.success) {
                         completedLessonIds = progressRes.progress.completedLessonIds;
+                        // Check if course reward already claimed
+                        courseCompleted = progressRes.progress.courseCompleted || false;
                     }
 
                     // Check if quiz already passed
@@ -53,7 +56,7 @@ async function loadCourse() {
                         quizPassed = true;
                     }
                 }
-            } catch (e) { }
+            } catch (e) { console.error('Error loading progress:', e); }
         }
 
         renderSidebar();
@@ -300,13 +303,32 @@ function updateEnrollButton() {
     }
 
     if (isPurchased) {
-        if (quizPassed) {
-            btn.textContent = 'Course Completed';
+        const hasQuiz = quiz && quiz.questions && quiz.questions.length > 0;
+        const allLessonsComplete = lessons.length > 0 && completedLessonIds.length === lessons.length;
+
+        if (courseCompleted) {
+            // Already claimed reward
+            btn.textContent = 'Reward Claimed';
             btn.disabled = true;
             btn.className = 'btn btn-success';
             mainBtn.textContent = 'Course Completed';
             mainBtn.className = 'btn btn-success btn-lg';
+        } else if (hasQuiz && quizPassed) {
+            // Has quiz and passed - can claim
+            btn.textContent = 'Claim Reward';
+            btn.onclick = claimReward;
+            btn.className = 'btn btn-primary';
+            mainBtn.textContent = 'Claim Reward';
+            mainBtn.onclick = claimReward;
+        } else if (!hasQuiz && allLessonsComplete) {
+            // No quiz, all lessons done - can claim
+            btn.textContent = 'Claim Reward';
+            btn.onclick = claimReward;
+            btn.className = 'btn btn-primary';
+            mainBtn.textContent = 'Claim Reward';
+            mainBtn.onclick = claimReward;
         } else {
+            // Still learning
             const nextLesson = lessons.find(l => !completedLessonIds.includes(l.id)) || lessons[0];
             btn.textContent = lessons.length ? 'Continue Learning' : 'Enrolled';
             btn.onclick = () => { if (nextLesson) navigateToLesson(nextLesson.id); };
