@@ -22,7 +22,7 @@
                         },
                         {
                             "name": "Search_Date",
-                            "value": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}"
+                            "value": "={{ $now.format('yyyy-MM-dd') }}"
                         }
                     ]
                 },
@@ -154,7 +154,7 @@
         {
             "parameters": {
                 "httpMethod": "POST",
-                "path": "search-places",
+                "path": "search-logs",
                 "responseMode": "responseNode",
                 "options": {}
             },
@@ -254,7 +254,41 @@
             ]
         }
     },
-    "pinData": {},
+    "pinData": {
+        "Webhook1": [
+            {
+                "headers": {
+                    "connection": "upgrade",
+                    "host": "n8n.zackdev.io",
+                    "content-length": "101",
+                    "sec-ch-ua-platform": "\"Windows\"",
+                    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+                    "sec-ch-ua": "\"Brave\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+                    "content-type": "application/json",
+                    "sec-ch-ua-mobile": "?0",
+                    "accept": "*/*",
+                    "sec-gpc": "1",
+                    "accept-language": "en-US,en;q=0.7",
+                    "origin": "https://knowway-eight.vercel.app",
+                    "sec-fetch-site": "cross-site",
+                    "sec-fetch-mode": "cors",
+                    "sec-fetch-dest": "empty",
+                    "referer": "https://knowway-eight.vercel.app/",
+                    "accept-encoding": "gzip, deflate, br, zstd"
+                },
+                "params": {},
+                "query": {},
+                "body": {
+                    "keyword": "language school",
+                    "city": "Marrakesh",
+                    "username": "akram_bouucham",
+                    "email": "aa@knowway.com"
+                },
+                "webhookUrl": "https://n8n.zackdev.io/webhook/search-places",
+                "executionMode": "production"
+            }
+        ]
+    },
     "meta": {
         "templateCredsSetupCompleted": true,
         "instanceId": "6fba02c56f732391825a81b0d3eb33212632413b406e8a0f3fe5b1cfa7369a99"

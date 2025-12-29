@@ -670,18 +670,6 @@ thead {
     margin-bottom: var(--space-xl);
 }
 
-@media (max-width: 900px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 500px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .stat-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -1001,12 +989,6 @@ thead {
     gap: var(--space-2xl);
 }
 
-@media (max-width: 900px) {
-    .course-hero-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 .course-hero h1 {
     font-size: 32px;
     margin-bottom: var(--space-md);
@@ -1089,12 +1071,6 @@ thead {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-sm);
-}
-
-@media (max-width: 600px) {
-    .what-learn-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 .what-learn-item {
@@ -1495,8 +1471,12 @@ thead {
 
 /* ===== Responsive ===== */
 
-/* Tablet and below */
-@media (max-width: 900px) {
+/* Mobile - Single breakpoint for all mobile/tablet devices */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
     .navbar .container {
         flex-wrap: wrap;
     }
@@ -1515,14 +1495,15 @@ thead {
     }
 
     .courses-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
-}
 
-/* Mobile */
-@media (max-width: 768px) {
-    body {
-        font-size: 14px;
+    .course-hero-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .what-learn-grid {
+        grid-template-columns: 1fr;
     }
 
     .container {
@@ -1733,37 +1714,8 @@ thead {
     .stat-card-label {
         font-size: 14px;
     }
-}
 
-/* Small mobile */
-@media (max-width: 500px) {
-    .container {
-        padding: 0 var(--space-md);
-    }
-
-    .courses-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero h1,
-    .learning-hero h1,
-    .page-hero h1 {
-        font-size: 24px;
-    }
-
-    .navbar-search {
-        display: none;
-    }
-
-    .navbar-nav a {
-        padding: 8px 10px;
-        font-size: 13px;
-    }
-
+    /* Progress items stack on mobile */
     .progress-item {
         flex-direction: column;
         gap: var(--space-md);
@@ -1778,7 +1730,7 @@ thead {
         font-size: 17px;
     }
 
-    /* Quick actions stack */
+    /* Quick actions */
     .quick-action {
         padding: var(--space-md);
     }
@@ -1791,5 +1743,10 @@ thead {
 
     .quick-action-text {
         font-size: 14px;
+    }
+
+    /* Hide search on small screens */
+    .navbar-search {
+        display: none;
     }
 }
