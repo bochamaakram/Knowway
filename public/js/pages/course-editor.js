@@ -37,8 +37,13 @@ async function checkAccess() {
 async function loadMyCourses() {
     const res = await api.getCourses({ limit: 100 });
     if (res.success) {
-        const user = getCurrentUser();
-        myCourses = res.courses.filter(c => c.user_id === user.id);
+        // Get user from API (no localStorage)
+        const user = await getCurrentUser();
+        if (user) {
+            myCourses = res.courses.filter(c => c.user_id === user.id);
+        } else {
+            myCourses = [];
+        }
         renderCoursesList();
     }
 }

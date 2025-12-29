@@ -33,15 +33,16 @@ const api = {
      * Core Request Method
      * -------------------
      * Makes authenticated HTTP requests to the API.
-     * Automatically attaches JWT token from localStorage if available.
+     * Automatically attaches JWT token from cookie if available.
      * 
      * @param {string} endpoint - The API endpoint (e.g., '/courses')
      * @param {object} options - Fetch options (method, body, headers)
      * @returns {Promise<object>} - Parsed JSON response
      */
     request: async (endpoint, options = {}) => {
-        // Get JWT token from browser's localStorage
-        const token = localStorage.getItem('token');
+        // Get JWT token from cookie
+        const tokenMatch = document.cookie.match(/auth_token=([^;]+)/);
+        const token = tokenMatch ? tokenMatch[1] : null;
 
         // Set default headers for JSON content
         const headers = { 'Content-Type': 'application/json' };

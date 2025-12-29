@@ -1587,17 +1587,17 @@ thead {
     .hero h1,
     .learning-hero h1,
     .page-hero h1 {
-        font-size: 24px;
+        font-size: 28px;
     }
 
     .page-hero p {
-        font-size: 14px;
+        font-size: 15px;
     }
 
     /* Cards */
     .courses-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: var(--space-sm);
+        gap: var(--space-md);
     }
 
     .card {
@@ -1608,15 +1608,23 @@ thead {
         height: 120px;
     }
 
+    .card-title {
+        font-size: 15px;
+    }
+
+    .card-instructor {
+        font-size: 13px;
+    }
+
     /* Course enrolled rows */
     .course-card-enrolled {
         gap: var(--space-md);
-        padding: var(--space-sm) var(--space-md);
+        padding: var(--space-md);
     }
 
     .course-card-enrolled img {
-        width: 80px;
-        height: 45px;
+        width: 100px;
+        height: 56px;
     }
 
     /* Forms */
@@ -1630,16 +1638,8 @@ thead {
         /* Prevents zoom on iOS */
     }
 
-    /* Buttons - Smaller on mobile */
-    .btn {
-        padding: 4px 10px;
-        font-size: 11px;
-    }
-
-    .btn-lg {
-        padding: 6px 14px;
-        font-size: 12px;
-    }
+    /* Buttons - Keep at normal desktop size for mobile usability */
+    /* No reduction - buttons stay at 15px base size */
 
     /* Profile */
     .profile-header {
@@ -1659,8 +1659,12 @@ thead {
 
     /* Panels */
     .panel {
-        padding: var(--space-md);
+        padding: var(--space-lg);
         border-radius: var(--radius-md);
+    }
+
+    .panel-title {
+        font-size: 16px;
     }
 
     /* Filter row */
@@ -1669,52 +1673,123 @@ thead {
         flex-wrap: nowrap;
         padding-bottom: var(--space-sm);
         -webkit-overflow-scrolling: touch;
+        gap: var(--space-md);
+    }
+
+    .filter-select,
+    .filter-search {
+        padding: 10px 14px;
+        font-size: 14px;
+        min-width: 120px;
     }
 
     .filter-btn {
         flex-shrink: 0;
     }
 
+    /* Progress items */
+    .progress-item {
+        gap: var(--space-lg);
+        padding: var(--space-md) 0;
+    }
+
+    .progress-item-img {
+        width: 120px;
+        height: 68px;
+    }
+
+    .progress-item-title {
+        font-size: 16px;
+    }
+
+    .progress-text {
+        font-size: 14px;
+    }
+
     /* Pagination */
     .pagination {
         flex-wrap: wrap;
+    }
+
+    /* Navbar */
+    .navbar-nav a {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .navbar-brand {
+        font-size: 22px;
+    }
+
+    /* Stats */
+    .stat-card {
+        padding: var(--space-lg);
+    }
+
+    .stat-card-value {
+        font-size: 28px;
+    }
+
+    .stat-card-label {
+        font-size: 14px;
     }
 }
 
 /* Small mobile */
 @media (max-width: 500px) {
     .container {
-        padding: 0 var(--space-sm);
+        padding: 0 var(--space-md);
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
     }
 
     .stats-grid {
         grid-template-columns: 1fr;
     }
 
-    .stat-card {
-        padding: var(--space-md);
-    }
-
-    .stat-card-value {
+    .hero h1,
+    .learning-hero h1,
+    .page-hero h1 {
         font-size: 24px;
     }
 
-    .navbar-nav a {
-        padding: 6px 8px;
-        font-size: 12px;
+    .navbar-search {
+        display: none;
     }
 
-    .page-hero h1 {
-        font-size: 20px;
+    .navbar-nav a {
+        padding: 8px 10px;
+        font-size: 13px;
     }
 
     .progress-item {
         flex-direction: column;
-        gap: var(--space-sm);
+        gap: var(--space-md);
     }
 
     .progress-item-img {
         width: 100%;
-        height: 100px;
+        height: 140px;
+    }
+
+    .progress-item-title {
+        font-size: 17px;
+    }
+
+    /* Quick actions stack */
+    .quick-action {
+        padding: var(--space-md);
+    }
+
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .quick-action-text {
+        font-size: 14px;
     }
 }

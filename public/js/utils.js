@@ -122,12 +122,24 @@ async function updateNavbar() {
 }
 
 /**
+ * Get Token from Cookie
+ * @returns {string|null} - Token or null if not found
+ */
+function getAuthToken() {
+    const match = document.cookie.match(/auth_token=([^;]+)/);
+    return match ? match[1] : null;
+}
+
+/**
  * Logout User
- * Clears authentication token and redirects to login page
+ * Clears authentication token cookie and redirects to login page
  */
 function logout() {
-    // Remove JWT token from localStorage - only thing we store
-    localStorage.removeItem('token');
+    // Remove auth token by setting expired cookie
+    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Clear user cache
+    cachedUser = null;
 
     // Redirect to login page
     window.location.href = 'login.html';
@@ -135,11 +147,11 @@ function logout() {
 
 /**
  * Check Authentication Status
- * @returns {boolean} - True if user has a valid token stored
+ * @returns {boolean} - True if user has a valid token in cookie
  */
 function isAuthenticated() {
-    // Returns true if token exists, false otherwise
-    return !!localStorage.getItem('token');
+    // Returns true if token exists in cookie
+    return !!getAuthToken();
 }
 
 // Cache for user data to avoid repeated API calls

@@ -14,33 +14,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadUserProfile() {
-    const user = getCurrentUser();
-    if (user) {
-        document.getElementById('profileAvatar').textContent = user.username.charAt(0).toUpperCase();
-        document.getElementById('profileName').textContent = user.username;
-        document.getElementById('profileEmail').textContent = user.email;
-
-        try {
-            const res = await api.getMyRole();
-            if (res.success) {
-                const role = res.role;
-                const badge = document.getElementById('roleBadge');
-                badge.className = 'role-badge ' + role;
-                badge.textContent = role === 'super_admin' ? 'Super Admin' : role === 'teacher' ? 'Teacher' : 'Learner';
-
-                if (role === 'super_admin') {
-                    document.getElementById('adminLink').style.display = 'inline-flex';
-                }
-
-                if (role === 'super_admin' || role === 'teacher') {
-                    document.getElementById('manageLink').style.display = 'inline-flex';
-                }
-
-                user.role = role;
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-        } catch (e) { console.error(e); }
+    // Fetch user from API (no localStorage)
+    const user = await getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
     }
+
+    document.getElementById('profileAvatar').textContent = user.username.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = user.username;
+    document.getElementById('profileEmail').textContent = user.email || '';
+
+    try {
+        const res = await api.getMyRole();
+        if (res.success) {
+            const role = res.role;
+            const badge = document.getElementById('roleBadge');
+            badge.className = 'role-badge ' + role;
+            badge.textContent = role === 'super_admin' ? 'Super Admin' : role === 'teacher' ? 'Teacher' : 'Learner';
+
+            if (role === 'super_admin') {
+                document.getElementById('adminLink').style.display = 'inline-flex';
+            }
+
+            if (role === 'super_admin' || role === 'teacher') {
+                document.getElementById('manageLink').style.display = 'inline-flex';
+            }
+        }
+    } catch (e) { console.error(e); }
 }
 
 async function loadDashboardData() {
