@@ -740,8 +740,8 @@ thead {
 /* ===== Progress Items - Simple rows ===== */
 .progress-item {
     display: flex;
-    gap: var(--space-xl);
-    padding: var(--space-lg) 0;
+    gap: var(--space-2xl);
+    padding: var(--space-xl) 0;
     border-bottom: 1px solid var(--border-color);
     transition: background var(--transition);
     cursor: pointer;
@@ -756,8 +756,8 @@ thead {
 }
 
 .progress-item-img {
-    width: 160px;
-    height: 90px;
+    width: 200px;
+    height: 112px;
     object-fit: cover;
     border-radius: var(--radius-md);
     flex-shrink: 0;
@@ -768,24 +768,24 @@ thead {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .progress-item-title {
     font-weight: 600;
-    margin-bottom: 6px;
-    font-size: 18px;
+    margin-bottom: 8px;
+    font-size: 20px;
     line-height: 1.4;
 }
 
 .progress-item-meta {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .progress-bar {
-    height: 10px;
+    height: 12px;
     background: var(--surface1);
     border-radius: var(--radius-full);
     overflow: hidden;
@@ -799,7 +799,7 @@ thead {
 }
 
 .progress-text {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--text-secondary);
     margin-top: var(--space-sm);
 }

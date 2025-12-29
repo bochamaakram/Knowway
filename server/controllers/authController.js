@@ -10,8 +10,36 @@ exports.register = async (req, res) => {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
+        // Validate email format - only allow common TLDs
+        const allowedTLDs = ['com', 'ma', 'net', 'org', 'edu', 'gov', 'io', 'co', 'fr', 'uk', 'de', 'es', 'it'];
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.([a-zA-Z]{2,})$/;
+        const match = email.match(emailRegex);
+
+        if (!match || !allowedTLDs.includes(match[1].toLowerCase())) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please enter a valid email address (allowed: .com, .ma, .net, .org, .edu, .gov, .io, .co, .fr, .uk, .de, .es, .it)'
+            });
+        }
+
+        // Validate email length
+        if (email.length > 254) {
+            return res.status(400).json({ success: false, message: 'Email address is too long' });
+        }
+
+        // Validate username (alphanumeric, underscores, 3-30 chars)
+        const usernameRegex = /^[a-zA-Z0-9_]{3,30}$/;
+        if (!usernameRegex.test(username)) {
+            return res.status(400).json({ success: false, message: 'Username must be 3-30 characters and contain only letters, numbers, and underscores' });
+        }
+
+        // Validate password strength (min 6 chars)
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+        }
+
         // Check if user exists
-        const { data: existing } = await supabase.from('users').select('id').eq('email', email);
+        const { data: existing } = await supabase.from('users').select('id').eq('email', email.toLowerCase());
         if (existing && existing.length > 0) {
             return res.status(400).json({ success: false, message: 'Email already registered' });
         }
@@ -20,7 +48,7 @@ exports.register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const { data, error } = await supabase
             .from('users')
-            .insert({ username, email, password: hashedPassword, role: 'learner', points: 0 })
+            .insert({ username, email: email.toLowerCase(), password: hashedPassword, role: 'learner', points: 0 })
             .select('id, username, email, role')
             .single();
 

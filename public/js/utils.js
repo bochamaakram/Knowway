@@ -84,8 +84,15 @@ async function updateNavbar() {
     const userContainer = document.getElementById('navbarUser');
     if (!userContainer) return;
 
-    // Get user data from localStorage
-    const user = JSON.parse(localStorage.getItem('user'));
+    // Check if authenticated first
+    if (!isAuthenticated()) {
+        // User is not logged in - show login button
+        userContainer.innerHTML = `<a href="login.html" class="btn btn-secondary btn-sm">Log in</a>`;
+        return;
+    }
+
+    // Get user data from API
+    const user = await getCurrentUser();
 
     if (user) {
         // User is logged in - show points and avatar
@@ -109,21 +116,18 @@ async function updateNavbar() {
             </a>
         `;
     } else {
-        // User is not logged in - show login button
+        // Token invalid - show login button
         userContainer.innerHTML = `<a href="login.html" class="btn btn-secondary btn-sm">Log in</a>`;
     }
 }
 
 /**
  * Logout User
- * Clears authentication data and redirects to login page
+ * Clears authentication token and redirects to login page
  */
 function logout() {
-    // Remove JWT token from localStorage
+    // Remove JWT token from localStorage - only thing we store
     localStorage.removeItem('token');
-
-    // Remove user data from localStorage
-    localStorage.removeItem('user');
 
     // Redirect to login page
     window.location.href = 'login.html';
@@ -138,13 +142,47 @@ function isAuthenticated() {
     return !!localStorage.getItem('token');
 }
 
+// Cache for user data to avoid repeated API calls
+let cachedUser = null;
+
 /**
- * Get Current User Data
- * @returns {object|null} - User object or null if not logged in
+ * Get Current User Data (async - fetches from API)
+ * @returns {Promise<object|null>} - User object or null if not logged in
  */
-function getCurrentUser() {
-    // Parse and return user object from localStorage
-    return JSON.parse(localStorage.getItem('user'));
+async function getCurrentUser() {
+    // If not authenticated, return null
+    if (!isAuthenticated()) {
+        cachedUser = null;
+        return null;
+    }
+
+    // Return cached user if available
+    if (cachedUser) {
+        return cachedUser;
+    }
+
+    // Fetch user data from API
+    try {
+        const res = await api.getMe();
+        if (res.success) {
+            cachedUser = res.user;
+            return res.user;
+        } else {
+            // Token is invalid, clear it
+            localStorage.removeItem('token');
+            return null;
+        }
+    } catch (e) {
+        console.error('Error fetching user:', e);
+        return null;
+    }
+}
+
+/**
+ * Clear user cache (call after updates)
+ */
+function clearUserCache() {
+    cachedUser = null;
 }
 
 /**
