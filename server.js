@@ -80,6 +80,9 @@ app.use('/api/quiz', require('./server/routes/quiz'));
 // Chat system: course discussion messages
 app.use('/api/chat', require('./server/routes/chat'));
 
+// Search logs: admin view of n8n search logs
+app.use('/api/search-logs', require('./server/routes/searchLogs'));
+
 // ====================
 // HEALTH CHECK
 // ====================

@@ -61,6 +61,32 @@
                     <tbody id="usersTable"></tbody>
                 </table>
             </div>
+
+            <!-- Search Logs Panel -->
+            <div class="panel" style="margin-top: var(--space-xl)">
+                <div class="panel-header">
+                    <h2 class="panel-title">Search Logs</h2>
+                </div>
+                <table class="table" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Keyword</th>
+                            <th>City</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchLogsTable"></tbody>
+                </table>
+                <div id="logsLoadingState" class="empty-state hidden">
+                    <div class="spinner"></div>
+                </div>
+                <div id="logsPagination" class="pagination"
+                    style="margin-top: var(--space-lg); display: flex; justify-content: center; gap: var(--space-sm);">
+                </div>
+            </div>
         </main>
     </div>
 
@@ -69,6 +95,9 @@
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script>
+        let currentLogsPage = 1;
+        const logsPerPage = 10;
+
         document.addEventListener('DOMContentLoaded', async () => {
             updateNavbar();
             await checkAccess();
@@ -90,6 +119,7 @@
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
                 await loadUsers();
+                await loadSearchLogs(1);
             } catch (e) {
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('accessDenied').classList.remove('hidden');
@@ -135,6 +165,81 @@
             } catch (e) {
                 showToast('Error', 'error');
             }
+        }
+
+        async function loadSearchLogs(page) {
+            currentLogsPage = page;
+            const tbody = document.getElementById('searchLogsTable');
+            const loading = document.getElementById('logsLoadingState');
+
+            tbody.innerHTML = '';
+            loading.classList.remove('hidden');
+
+            try {
+                const res = await api.request(`/search-logs?page=${page}&limit=${logsPerPage}`);
+                loading.classList.add('hidden');
+
+                if (res.success && res.logs) {
+                    if (res.logs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No search logs yet</td></tr>';
+                    } else {
+                        tbody.innerHTML = res.logs.map(log => `
+                            <tr>
+                                <td>${log.id}</td>
+                                <td>${log.search_date || new Date(log.created_at).toLocaleDateString()}</td>
+                                <td>${escapeHtml(log.username || '-')}</td>
+                                <td>${escapeHtml(log.email || '-')}</td>
+                                <td>${escapeHtml(log.keyword || '-')}</td>
+                                <td>${escapeHtml(log.city || '-')}</td>
+                            </tr>
+                        `).join('');
+                    }
+
+                    renderLogsPagination(res.pagination);
+                }
+            } catch (e) {
+                loading.classList.add('hidden');
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--red)">Failed to load logs</td></tr>';
+            }
+        }
+
+        function renderLogsPagination(pagination) {
+            const container = document.getElementById('logsPagination');
+            if (!pagination || pagination.totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Previous button
+            html += `<button class="btn btn-sm ${pagination.page <= 1 ? 'disabled' : ''}" 
+                onclick="loadSearchLogs(${pagination.page - 1})" ${pagination.page <= 1 ? 'disabled' : ''}>
+                ← Prev
+            </button>`;
+
+            // Page numbers
+            for (let i = 1; i <= pagination.totalPages; i++) {
+                if (i === 1 || i === pagination.totalPages || (i >= pagination.page - 1 && i <= pagination.page + 1)) {
+                    html += `<button class="btn btn-sm ${i === pagination.page ? 'btn-primary' : ''}" 
+                        onclick="loadSearchLogs(${i})">${i}</button>`;
+                } else if (i === pagination.page - 2 || i === pagination.page + 2) {
+                    html += '<span style="padding: 0 8px">...</span>';
+                }
+            }
+
+            // Next button
+            html += `<button class="btn btn-sm ${pagination.page >= pagination.totalPages ? 'disabled' : ''}" 
+                onclick="loadSearchLogs(${pagination.page + 1})" ${pagination.page >= pagination.totalPages ? 'disabled' : ''}>
+                Next →
+            </button>`;
+
+            // Info
+            html += `<span style="margin-left: var(--space-md); color: var(--text-muted); font-size: 13px;">
+                Page ${pagination.page} of ${pagination.totalPages} (${pagination.total} total)
+            </span>`;
+
+            container.innerHTML = html;
         }
     </script>
 </body>
