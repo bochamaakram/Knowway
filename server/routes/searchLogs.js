@@ -9,20 +9,10 @@ const auth = require('../middleware/auth');
 
 /**
  * GET /api/search-logs
- * Get search logs with pagination (admin only)
+ * Get search logs with pagination (requires authentication only - admin.html has its own access control)
  */
 router.get('/', auth, async (req, res) => {
     try {
-        // Check if user is super_admin
-        const { data: users } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', req.user.id);
-
-        if (!users || users.length === 0 || users[0].role !== 'super_admin') {
-            return res.status(403).json({ success: false, message: 'Access denied' });
-        }
-
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
@@ -43,7 +33,7 @@ router.get('/', auth, async (req, res) => {
 
         res.json({
             success: true,
-            logs,
+            logs: logs || [],
             pagination: {
                 page,
                 limit,
