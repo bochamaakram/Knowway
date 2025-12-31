@@ -83,8 +83,8 @@ app.use('/api/chat', require('./server/routes/chat'));
 // Search logs: admin view of n8n search logs
 app.use('/api/search-logs', require('./server/routes/searchLogs'));
 
-// Categories: dynamic course categories
-app.use('/api/categories', require('./server/routes/categories'));
+// AI Chatbot: proxy for OpenRouter API (keeps API key secure)
+app.use('/api/ai-chat', require('./server/routes/aiChat'));
 
 // ====================
 // HEALTH CHECK

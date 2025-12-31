@@ -7,13 +7,10 @@ let favoriteIds = [];
 let purchasedIds = [];
 let currentPage = 1;
 const limit = 6;
-let filters = { category: '', level: '', search: '', id: '', price: '', sort: 'newest' };
+let filters = { category: '', level: '', search: '', sort: 'newest' };
 
 document.addEventListener('DOMContentLoaded', async () => {
     updateNavbar();
-
-    // Load categories first
-    await loadCategories();
 
     // Parse URL params
     const urlParams = new URLSearchParams(window.location.search);
@@ -23,41 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     if (urlParams.get('category')) {
         filters.category = urlParams.get('category');
-        document.getElementById('categoryFilter').value = filters.category;
     }
 
     setupFilters();
     await loadCourses();
 });
-
-async function loadCategories() {
-    try {
-        const res = await api.getCategories();
-        if (res.success) {
-            const select = document.getElementById('categoryFilter');
-            res.categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.code; // code is used for filtering usually, or use ID if backend switched
-                // Note: Backend now expects ID for exact match, or we could filter by code if we join.
-                // Our updated coursesController checks `category_id`.
-                // BUT `explore.js` does client side filtering mostly.
-                // AND legacy courses might have string 'dev'.
-                // Ideally we use ID here if the API returns IDs.
-                // Let's check schema: categories has id, code, name.
-                // courses has category_id.
-                // If I use ID here, I can filter by `c.category_id`.
-                // Client-side filtering in explore.js currently uses `c.category` string match (see api.js update to coursesController which maps `category` to code).
-                // So keeping `cat.code` is safer for now if we want to support both or mixed.
-                // Wait, coursesController sets `category` to `code` for compatibility.
-                // So using `cat.code` here is correct for client-side filtering.
-                option.text = cat.name;
-                select.appendChild(option);
-            });
-            // Restore selection if needed
-            if (filters.category) select.value = filters.category;
-        }
-    } catch (e) { console.error('Error loading categories:', e); }
-}
 
 function setupFilters() {
     document.getElementById('searchInput').addEventListener('input', debounce(e => {
@@ -68,12 +35,6 @@ function setupFilters() {
 
     document.getElementById('categoryFilter').addEventListener('change', e => {
         filters.category = e.target.value;
-        currentPage = 1;
-        applyFilters();
-    });
-
-    document.getElementById('priceFilter').addEventListener('change', e => {
-        filters.price = e.target.value;
         currentPage = 1;
         applyFilters();
     });
@@ -89,7 +50,10 @@ function setupFilters() {
         applyFilters();
     });
 
-    // Set initial values from URL params already handled in DOMContentLoaded
+    // Set initial values from URL params
+    if (filters.category) {
+        document.getElementById('categoryFilter').value = filters.category;
+    }
 }
 
 async function loadCourses() {
@@ -120,10 +84,6 @@ function applyFilters() {
     filteredCourses = allCourses.filter(c => {
         if (filters.category && c.category !== filters.category) return false;
         if (filters.level && c.level !== filters.level) return false;
-        if (filters.price) {
-            if (filters.price === 'free' && !c.is_free) return false;
-            if (filters.price === 'paid' && c.is_free) return false;
-        }
         if (filters.search) {
             const search = filters.search.toLowerCase();
             if (!c.title.toLowerCase().includes(search) &&

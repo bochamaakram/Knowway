@@ -14,7 +14,6 @@ DROP TABLE IF EXISTS course_messages CASCADE;
 DROP TABLE IF EXISTS search_logs CASCADE;
 DROP TABLE IF EXISTS scraped_data CASCADE;
 DROP TABLE IF EXISTS courses CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 -- Users table
@@ -34,21 +33,12 @@ CREATE TABLE users (
 );
 
 -- Courses table
--- Categories table
-CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
-    code VARCHAR(50) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Courses table
 CREATE TABLE courses (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
     short_description VARCHAR(500),
-    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+    category VARCHAR(20) NOT NULL DEFAULT 'dev' CHECK (category IN ('dev', 'design', 'marketing')),
     duration INTEGER NOT NULL DEFAULT 0,
     is_free BOOLEAN DEFAULT TRUE,
     point_cost INTEGER DEFAULT 0,
@@ -67,9 +57,6 @@ CREATE TABLE courses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- Indexes
-CREATE INDEX idx_courses_category ON courses(category_id);
 
 -- Favorites table
 CREATE TABLE favorites (
@@ -196,7 +183,7 @@ CREATE TABLE course_messages (
 -- Indexes
 CREATE INDEX idx_courses_user_id ON courses(user_id);
 CREATE INDEX idx_courses_status ON courses(status);
-CREATE INDEX idx_courses_category_id ON courses(category_id);
+CREATE INDEX idx_courses_category ON courses(category);
 CREATE INDEX idx_purchases_user_id ON purchases(user_id);
 CREATE INDEX idx_lessons_course ON course_lessons(course_id);
 CREATE INDEX idx_lessons_order ON course_lessons(course_id, order_index);

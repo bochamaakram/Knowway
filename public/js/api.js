@@ -83,9 +83,6 @@ const api = {
     // COURSE ROUTES
     // ==============
 
-    /** Get all categories */
-    getCategories: () => api.request('/categories'),
-
     /** Get all courses with optional filters (category, level, search) */
     getCourses: (params = {}) => api.request('/courses?' + new URLSearchParams(params)),
 

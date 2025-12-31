@@ -2,23 +2,27 @@
  * knowway AI Chatbot
  * ==================
  * Handles the floating chatbot widget, API communication, and message history.
+ * Integrates with n8n workflow for dynamic system context.
  */
 
 (function () {
     // Config
     const CONFIG = {
-        apiEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
-        apiKey: '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',
-        model: 'google/gemma-3-27b-it:free',
+        apiEndpoint: '/api/ai-chat/completions', // Backend proxy (API key stored securely on server)
         siteUrl: window.location.origin,
         siteName: 'knowway',
-        storageKey: 'knowway_chat_history'
+        storageKey: 'knowway_chat_history',
+        contextStorageKey: 'knowway_system_context',
+        n8nWebhook: 'https://n8n.zackdev.io/webhook-test/get-bot-context',
+        contextCacheDuration: 60 * 60 * 1000, // 1 hour cache
+        defaultSystemPrompt: 'You are a helpful AI assistant for knowway, a learning platform. Help users navigate the app, find courses, and answer questions about features. Be concise, friendly, and helpful.'
     };
 
     // State
     let isOpen = false;
     let messages = loadMessages();
     let isTyping = false;
+    let systemContext = null;
 
     // DOM Elements (will be created)
     let triggerBtn, panel, messagesContainer, input, sendBtn;
@@ -31,10 +35,55 @@
     };
 
     // Initialize
-    function init() {
+    async function init() {
         createDOM();
         attachEvents();
         renderMessages();
+        // Fetch system context from n8n (non-blocking)
+        await loadSystemContext();
+    }
+
+    // Load system context from n8n webhook or cache
+    async function loadSystemContext() {
+        try {
+            // Check cache first
+            const cached = localStorage.getItem(CONFIG.contextStorageKey);
+            if (cached) {
+                const { context, timestamp } = JSON.parse(cached);
+                const isExpired = Date.now() - timestamp > CONFIG.contextCacheDuration;
+                if (!isExpired && context) {
+                    systemContext = context;
+                    console.log('[Chatbot] Loaded system context from cache');
+                    return;
+                }
+            }
+
+            // Fetch from n8n webhook
+            console.log('[Chatbot] Fetching system context from n8n...');
+            const response = await fetch(CONFIG.n8nWebhook, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (!response.ok) {
+                throw new Error(`n8n webhook failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.system_context) {
+                systemContext = data.system_context;
+                // Cache the context
+                localStorage.setItem(CONFIG.contextStorageKey, JSON.stringify({
+                    context: systemContext,
+                    timestamp: Date.now(),
+                    lastUpdated: data.last_updated
+                }));
+                console.log('[Chatbot] System context loaded from n8n');
+            }
+        } catch (error) {
+            console.warn('[Chatbot] Could not load n8n context, using default:', error.message);
+            systemContext = CONFIG.defaultSystemPrompt;
+        }
     }
 
     // Create DOM Structure
@@ -193,7 +242,7 @@
         if (loader) loader.remove();
     }
 
-    // Connect to OpenRouter API
+    // Connect to Backend AI Proxy
     async function fetchObject(userText) {
         // Prepare context from last few messages
         const recentMessages = messages.slice(-6).map(m => ({
@@ -201,20 +250,20 @@
             content: m.content
         }));
 
+        // Use dynamic system context from n8n or fallback
+        const systemPrompt = systemContext || CONFIG.defaultSystemPrompt;
+
+        // Call backend proxy (API key is secure on server)
         const response = await fetch(CONFIG.apiEndpoint, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${CONFIG.apiKey}`,
-                "HTTP-Referer": CONFIG.siteUrl,
-                "X-Title": CONFIG.siteName,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": CONFIG.model,
-                "messages": [
+                messages: [
                     {
                         "role": "system",
-                        "content": "You are a helpful AI assistant for knowway, a learning platform. Be concise, friendly, and helpful."
+                        "content": systemPrompt
                     },
                     ...recentMessages
                 ]
@@ -226,7 +275,7 @@
         }
 
         const data = await response.json();
-        return data.choices[0].message.content;
+        return data.content;
     }
 
     function scrollToBottom() {

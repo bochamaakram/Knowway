@@ -9,31 +9,7 @@ let editingLesson = null;
 document.addEventListener('DOMContentLoaded', async () => {
     updateNavbar();
     await checkAccess();
-    await loadCategories();
 });
-
-async function loadCategories() {
-    try {
-        const res = await api.getCategories();
-        if (res.success) {
-            const select = document.getElementById('courseCategory');
-            // Clear existing options except maybe a placeholder if one exists, 
-            // but usually we want to replace all hardcoded ones.
-            select.innerHTML = '';
-
-            res.categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat.id; // Use ID for course creation/update as backend expects category_id
-                // Wait, backend `createCourse` expects `category_id`.
-                // In my `coursesController` update:
-                // `category_id: categoryId` where `categoryId = category ? parseInt(category) : 1`
-                // So I should set option value to `cat.id`.
-                option.text = cat.name;
-                select.appendChild(option);
-            });
-        }
-    } catch (e) { console.error('Error loading categories:', e); }
-}
 
 async function checkAccess() {
     if (!isAuthenticated()) {
@@ -186,12 +162,7 @@ function showCourseForm(course = null) {
     document.getElementById('courseTitle').value = course?.title || '';
     document.getElementById('courseShortDesc').value = course?.short_description || '';
     document.getElementById('courseDesc').value = course?.description || '';
-    document.getElementById('courseDesc').value = course?.description || '';
-    // course.category_id is what we need if we bound values to IDs.
-    // backend getCourse returns `category_id` (raw) and `category` (code).
-    // The select options values are IDs now.
-    document.getElementById('courseCategory').value = course?.category_id || 1;
-    document.getElementById('courseLevel').value = course?.level || 'beginner';
+    document.getElementById('courseCategory').value = course?.category || 'dev';
     document.getElementById('courseLevel').value = course?.level || 'beginner';
     document.getElementById('courseFree').checked = course?.is_free ?? true;
     document.getElementById('coursePointCost').value = course?.point_cost || 0;

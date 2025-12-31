@@ -1,0 +1,173 @@
+{
+    "name": "Live Website Scraper API",
+    "nodes": [
+        {
+            "parameters": {
+                "path": "get-bot-context",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook",
+            "name": "Webhook (GET)",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                460,
+                340
+            ],
+            "webhookId": "get-bot-context"
+        },
+        {
+            "parameters": {
+                "url": "https://knowway-eight.vercel.app",
+                "options": {
+                    "response": {
+                        "response": {
+                            "responseFormat": "text"
+                        }
+                    }
+                }
+            },
+            "id": "fetch-site",
+            "name": "Fetch Website",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                680,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// Extract text content from HTML\nconst html = $input.first().json.data || $input.first().json.body || '';\n\n// Remove script and style tags with their content\nlet text = html\n  .replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '')\n  .replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&quot;/g, '\"')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\n// Limit text length\ntext = text.substring(0, 6000);\n\nreturn [{ json: { cleanedText: text } }];"
+            },
+            "id": "clean-html",
+            "name": "Clean HTML",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                900,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://openrouter.ai/api/v1/chat/completions",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"model\": \"google/gemma-3-27b-it:free\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a configuration tool that generates system prompts for AI chatbots.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Here is the content of the knowway learning platform website:\\n\\n{{ $json.cleanedText }}\\n\\nBased on this, generate a concise but complete System Prompt for an AI Chatbot on this site. The prompt must:\\n1. Define the persona (You are knowway's AI Assistant)\\n2. Describe platform features (courses, learning paths, favorites, in-person sessions)\\n3. Explain navigation (Explore, Learning, Profile pages)\\n4. Set tone: helpful, friendly, educational\\n\\nReturn ONLY the raw system prompt text, no markdown.\"\n    }\n  ]\n}",
+                "options": {}
+            },
+            "id": "call-openrouter",
+            "name": "Call OpenRouter AI",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1120,
+                340
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "YOUR_CREDENTIAL_ID",
+                    "name": "OpenRouter API"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "// Extract the AI response\nconst response = $input.first().json;\nconst systemPrompt = response.choices?.[0]?.message?.content || 'You are a helpful AI assistant for knowway, a learning platform.';\n\nreturn [{\n  json: {\n    system_context: systemPrompt,\n    last_updated: new Date().toISOString()\n  }\n}];"
+            },
+            "id": "format-response",
+            "name": "Format Response",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1340,
+                340
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {
+                    "responseHeaders": {
+                        "entries": [
+                            {
+                                "name": "Access-Control-Allow-Origin",
+                                "value": "*"
+                            }
+                        ]
+                    }
+                }
+            },
+            "id": "respond",
+            "name": "Respond to App",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1560,
+                340
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook (GET)": {
+            "main": [
+                [
+                    {
+                        "node": "Fetch Website",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Website": {
+            "main": [
+                [
+                    {
+                        "node": "Clean HTML",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Clean HTML": {
+            "main": [
+                [
+                    {
+                        "node": "Call OpenRouter AI",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Call OpenRouter AI": {
+            "main": [
+                [
+                    {
+                        "node": "Format Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Format Response": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to App",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
