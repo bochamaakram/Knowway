@@ -67,7 +67,19 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from 'public' directory (HTML, CSS, JS, images)
-app.use(express.static(path.join(__dirname, 'public')));
+// fallthrough: false ensures we handle missing files ourselves
+app.use(express.static(path.join(__dirname, 'public'), {
+    fallthrough: true
+}));
+
+// Handle missing static files - serve 404 page for any .html request that doesn't exist
+app.use((req, res, next) => {
+    // If requesting an HTML file that doesn't exist, show 404
+    if (req.path.endsWith('.html') || req.path.includes('.')) {
+        return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+    }
+    next();
+});
 
 // ====================
 // API ROUTES
