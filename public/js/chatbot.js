@@ -1,42 +1,22 @@
 /**
  * knowway AI Chatbot
  * ==================
- * Handles the floating chatbot widget, API communication, and message history.
- * Integrates with n8n workflow for dynamic system context.
+ * Simple chatbot widget that sends messages to n8n AI Agent workflow.
  */
 
 (function () {
-    // Config
+    // Config - Uses backend proxy to keep webhook URL hidden
     const CONFIG = {
-        apiEndpoint: '/api/ai-chat/completions', // Backend proxy (API key stored securely on server)
-        siteUrl: window.location.origin,
-        siteName: 'knowway',
-        storageKey: 'knowway_chat_history',
-        contextStorageKey: 'knowway_system_context',
-        knowledgeBaseUrl: '/js/ai-knowledge-base.json',
-        n8nWebhook: 'https://n8n.zackdev.io/webhook-test/get-bot-context',
-        contextCacheDuration: 60 * 60 * 1000, // 1 hour cache
-        defaultSystemPrompt: `You are the Knowway AI assistant. Answer in ONE concise sentence only.
-
-RULES:
-- Use ONLY the KNOWLEDGE_BASE data below to answer
-- NEVER output code, function calls, or tool syntax
-- NEVER make up URLs - only use paths from KNOWLEDGE_BASE
-- Direct users to specific pages for actions (e.g., "Go to /explore.html to browse courses")
-- If asked about specific courses, say "Use the filters on /explore.html"
-
-KNOWLEDGE_BASE:
-{{KNOWLEDGE_BASE}}`
+        apiEndpoint: '/api/ai-chat/n8n', // Backend proxy (webhook URL hidden in server .env)
+        storageKey: 'knowway_chat_history'
     };
 
     // State
     let isOpen = false;
     let messages = loadMessages();
     let isTyping = false;
-    let systemContext = null;
-    let knowledgeBase = null;
 
-    // DOM Elements (will be created)
+    // DOM Elements
     let triggerBtn, panel, messagesContainer, input, sendBtn;
 
     // Icons
@@ -47,69 +27,11 @@ KNOWLEDGE_BASE:
     };
 
     // Initialize
-    async function init() {
+    function init() {
         createDOM();
         attachEvents();
         renderMessages();
-        // Load knowledge base and system context
-        await Promise.all([loadKnowledgeBase(), loadSystemContext()]);
-    }
-
-    // Load knowledge base from JSON file
-    async function loadKnowledgeBase() {
-        try {
-            const response = await fetch(CONFIG.knowledgeBaseUrl);
-            if (response.ok) {
-                knowledgeBase = await response.json();
-                console.log('[Chatbot] Knowledge base loaded');
-            }
-        } catch (error) {
-            console.warn('[Chatbot] Could not load knowledge base:', error.message);
-        }
-    }
-
-
-    // Load system context from n8n webhook or cache
-    async function loadSystemContext() {
-        try {
-            // Check cache first
-            const cached = localStorage.getItem(CONFIG.contextStorageKey);
-            if (cached) {
-                const { context, timestamp } = JSON.parse(cached);
-                const isExpired = Date.now() - timestamp > CONFIG.contextCacheDuration;
-                if (!isExpired && context) {
-                    systemContext = context;
-                    console.log('[Chatbot] Loaded system context from cache');
-                    return;
-                }
-            }
-
-            // Fetch from n8n webhook
-            console.log('[Chatbot] Fetching system context from n8n...');
-            const response = await fetch(CONFIG.n8nWebhook, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            });
-
-            if (!response.ok) {
-                throw new Error(`n8n webhook failed: ${response.status}`);
-            }
-
-            const data = await response.json();
-            if (data.system_context) {
-                systemContext = data.system_context;
-                // Cache the context
-                localStorage.setItem(CONFIG.contextStorageKey, JSON.stringify({
-                    context: systemContext,
-                    timestamp: Date.now(),
-                    lastUpdated: data.last_updated
-                }));
-                console.log('[Chatbot] System context loaded from n8n');
-            }
-        } catch (error) {
-            console.warn('[Chatbot] Could not load n8n context, using default:', error.message);
-            systemContext = CONFIG.defaultSystemPrompt;
-        }
+        console.log('[Chatbot] Initialized - n8n only mode');
     }
 
     // Create DOM Structure
@@ -152,10 +74,7 @@ KNOWLEDGE_BASE:
 
     // Attach Event Listeners
     function attachEvents() {
-        // Toggle Chat
         triggerBtn.addEventListener('click', toggleChat);
-
-        // Send Message
         sendBtn.addEventListener('click', sendMessage);
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -213,24 +132,22 @@ KNOWLEDGE_BASE:
         const text = input.value.trim();
         if (!text || isTyping) return;
 
-        // 1. Add User Message
+        // Add User Message
         addMessage('user', text);
         input.value = '';
         input.style.height = 'auto';
 
-        // 2. Show Typing Indicator
+        // Show Typing Indicator
         isTyping = true;
         showTypingIndicator();
 
         try {
-            // 3. Call API
-            const response = await fetchObject(text);
-
-            // 4. Remove Typing Indicator & Add Bot Response
+            // Call n8n AI Agent
+            const response = await callN8N(text);
             removeTypingIndicator();
             addMessage('assistant', response);
         } catch (error) {
-            console.error('Chat API Error:', error);
+            console.error('[Chatbot] Error:', error);
             removeTypingIndicator();
             addMessage('assistant', 'Sorry, I encountered an error. Please try again later.');
         } finally {
@@ -268,34 +185,15 @@ KNOWLEDGE_BASE:
         if (loader) loader.remove();
     }
 
-    // Connect to Backend AI Proxy
-    async function fetchObject(userText) {
-        // Prepare context from last few messages
-        const recentMessages = messages.slice(-6).map(m => ({
-            role: m.role,
-            content: m.content
-        }));
-
-        // Build system prompt with knowledge base
-        let systemPrompt = systemContext || CONFIG.defaultSystemPrompt;
-        if (knowledgeBase) {
-            systemPrompt = systemPrompt.replace('{{KNOWLEDGE_BASE}}', JSON.stringify(knowledgeBase, null, 2));
-        }
-
-        // Call backend proxy (API key is secure on server)
+    // Call backend proxy (which forwards to n8n)
+    async function callN8N(userText) {
         const response = await fetch(CONFIG.apiEndpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                messages: [
-                    {
-                        "role": "system",
-                        "content": systemPrompt
-                    },
-                    ...recentMessages
-                ]
+                query: userText
             })
         });
 
@@ -304,7 +202,7 @@ KNOWLEDGE_BASE:
         }
 
         const data = await response.json();
-        return data.content;
+        return data.content || 'Sorry, I could not generate a response.';
     }
 
     function scrollToBottom() {
@@ -319,7 +217,6 @@ KNOWLEDGE_BASE:
     }
 
     function formatMarkdown(text) {
-        // Simple markdown formatter
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')

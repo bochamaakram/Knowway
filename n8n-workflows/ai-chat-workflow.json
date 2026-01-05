@@ -1,0 +1,113 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "16993d15-3dff-4c11-93ec-638664fe2c8a",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "9f62588b-2c64-4900-9073-6e37c4096d1c",
+            "name": "Chat Webhook1",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                1216,
+                2992
+            ],
+            "webhookId": "16993d15-3dff-4c11-93ec-638664fe2c8a"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "={{ $json.body.query }}",
+                "options": {
+                    "systemMessage": "You are the AI Support Agent for the Knowway Course Management System. Your role is to assist students and administrators by retrieving accurate course information from the database.\n\nGuidelines:\n1. ALWAYS use the \"get_events\" tool when asked about available courses, prices, or details.\n2. Present the data clearly: List the Course Title, Price, and a brief Description.\n3. If the tool returns no data, state clearly: \"No courses are currently listed in the system.\"\n4. Do not invent or hallucinate course details that are not returned by the tool.\n5. Keep answers professional, concise, and helpful for a web platform user."
+                }
+            },
+            "id": "bba9f48b-b8f2-4ec8-acfd-b7954d064f21",
+            "name": "AI Agent1",
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 1.6,
+            "position": [
+                1408,
+                2992
+            ]
+        },
+        {
+            "parameters": {
+                "model": "mistralai/devstral-2512:free",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1408,
+                3232
+            ],
+            "id": "0cfdd87d-e81d-45e0-a743-3ef6b9c96c5f",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "bm9fF3peIBa8xtvw",
+                    "name": "OpenRouter account 3"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "toolDescription": "Call this to get a list of courses from the database. Returns course title, description and price.",
+                "url": "https://knowway-eight.vercel.app/api/courses",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequestTool",
+            "typeVersion": 4.3,
+            "position": [
+                1552,
+                3232
+            ],
+            "id": "f9fbf777-4eda-4cdf-9bd2-4aedf89d89dd",
+            "name": "get_events"
+        }
+    ],
+    "connections": {
+        "Chat Webhook1": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "get_events": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "6fba02c56f732391825a81b0d3eb33212632413b406e8a0f3fe5b1cfa7369a99"
+    }
+}

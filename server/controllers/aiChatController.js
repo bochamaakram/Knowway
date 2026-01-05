@@ -77,3 +77,62 @@ exports.chatCompletion = async (req, res) => {
         });
     }
 };
+
+/**
+ * N8N Chat Proxy
+ * --------------
+ * Proxies chat requests to n8n AI Agent workflow.
+ * Keeps webhook URL secure on the server.
+ * 
+ * @route POST /api/ai-chat/n8n
+ * @body {string} query - User's message
+ * @returns {object} response - n8n AI Agent response
+ */
+exports.n8nChatProxy = async (req, res) => {
+    try {
+        const { query } = req.body;
+
+        if (!query) {
+            return res.status(400).json({
+                success: false,
+                message: 'Query is required'
+            });
+        }
+
+        const webhookUrl = process.env.AI_CHATBOT_WEBHOOK;
+        if (!webhookUrl) {
+            console.error('AI_CHATBOT_WEBHOOK not configured');
+            return res.status(500).json({
+                success: false,
+                message: 'AI service not configured'
+            });
+        }
+
+        // Proxy request to n8n webhook
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query })
+        });
+
+        if (!response.ok) {
+            throw new Error(`n8n webhook error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        res.json({
+            success: true,
+            content: data.output || data.content || 'No response received'
+        });
+
+    } catch (err) {
+        console.error('N8N Chat error:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to get AI response'
+        });
+    }
+};
