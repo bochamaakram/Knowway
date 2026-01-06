@@ -54,6 +54,18 @@
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.25);
     --shadow-glow: 0 0 20px rgba(203, 166, 247, 0.15);
+    --shadow-search-focus: 0 0 20px -5px rgba(203, 166, 247, 0.3);
+    --animate-shimmer: shimmer 2s linear infinite;
+
+    @keyframes shimmer {
+        from {
+            background-position: 200% 0;
+        }
+
+        to {
+            background-position: -200% 0;
+        }
+    }
 }
 
 /* Base Styles */
@@ -310,9 +322,147 @@
     }
 
     .shimmer {
-        background: linear-gradient(90deg, transparent, rgba(203, 166, 247, 0.05), transparent);
-        background-size: 200% 100%;
-        animation: shimmer 2s infinite;
+        @apply animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent bg-[length:400%_100%];
+    }
+
+    /* Explore Page Components */
+    @layer components {
+        .search-section {
+            @apply py-8 bg-mantle/50 border-b border-white/5;
+        }
+
+        .filter-row {
+            @apply flex flex-wrap gap-4 items-center;
+        }
+
+        .filter-search {
+            @apply flex-1 min-w-[280px] bg-base border border-surface0/50 rounded-xl px-4 py-3 text-text outline-none transition-all focus:border-primary/50 focus:shadow-search-focus;
+        }
+
+        .filter-select {
+            @apply bg-base border border-surface0/50 rounded-xl px-4 py-3 text-text outline-none transition-all cursor-pointer hover:border-surface1 focus:border-primary/50;
+        }
+
+        .results-count {
+            @apply text-sm text-subtext text-opacity-60 mb-6 font-medium tracking-wide uppercase;
+        }
+
+        .courses-grid {
+            @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12;
+        }
+
+        .pagination {
+            @apply flex items-center justify-center gap-6 py-12;
+        }
+
+        .pagination-btn {
+            @apply w-12 h-12 flex items-center justify-center rounded-xl bg-surface0 text-text transition-all hover:bg-surface1 hover:-translate-y-0.5 disabled:opacity-30 disabled:pointer-events-none;
+        }
+
+        .pagination-info {
+            @apply text-sm font-medium text-subtext;
+        }
+
+        .empty-state {
+            @apply flex flex-col items-center justify-center py-20 text-center;
+        }
+    }
+
+    /* Learning & Course Page Components */
+    .page-hero {
+        @apply py-16 bg-mantle/50 border-b border-white/5 mb-12;
+    }
+
+    .page-hero h1 {
+        @apply text-4xl font-extrabold text-text mb-2;
+    }
+
+    .page-hero p {
+        @apply text-lg text-subtext;
+    }
+
+    .empty-learning {
+        @apply flex flex-col items-center justify-center py-24 text-center bg-base rounded-3xl border border-surface0/50 shadow-glow;
+    }
+
+    .course-layout {
+        @apply flex flex-col lg:flex-row gap-8;
+    }
+
+    .course-sidebar {
+        @apply flex-none w-full lg:w-80 space-y-6 sticky top-24 h-fit;
+    }
+
+    .course-content {
+        @apply flex-auto space-y-8;
+    }
+
+    /* Course Editor Components */
+    .manage-layout {
+        @apply grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 mt-8;
+    }
+
+    .sidebar-list {
+        @apply bg-base border border-surface0/50 rounded-2xl overflow-hidden;
+    }
+
+    .sidebar-header {
+        @apply p-6 border-b border-surface0/50 flex justify-between items-center;
+    }
+
+    .editor-panel {
+        @apply bg-base border border-surface0/50 rounded-2xl p-8 shadow-md;
+    }
+
+    .sidebar-title {
+        @apply font-bold text-sm tracking-wide text-subtext/80 uppercase;
+    }
+
+    .course-list-item,
+    .lesson-list-item {
+        @apply p-6 border-b border-surface0/50 cursor-pointer transition-all hover:bg-mantle;
+    }
+
+    .course-list-item.active,
+    .lesson-list-item.active {
+        @apply bg-primary/5 border-l-4 border-l-primary;
+    }
+
+    .add-lesson-btn {
+        @apply w-full p-6 border-2 border-dashed border-surface0/50 rounded-xl text-subtext transition-all hover:border-primary/50 hover:text-primary mt-6;
+    }
+
+    /* In-Person Search Components */
+    .search-card {
+        @apply bg-base rounded-3xl p-8 shadow-lg border border-surface0/50;
+    }
+
+    .search-inputs {
+        @apply grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-6 items-end;
+    }
+
+    .quick-tags {
+        @apply flex flex-wrap items-center gap-3 mt-8;
+    }
+
+    .quick-tag {
+        @apply px-4 py-2 bg-mantle border border-surface0/50 rounded-full text-sm transition-all hover:bg-primary hover:text-crust hover:border-primary;
+    }
+
+    .places-grid {
+        @apply flex flex-col gap-px bg-surface0/50 border border-surface0/50 rounded-2xl overflow-hidden mt-8;
+    }
+
+    .place-card-row {
+        @apply flex gap-6 p-6 bg-base transition-all hover:bg-mantle cursor-pointer;
+    }
+
+    .place-card-image {
+        @apply w-32 h-20 rounded-lg overflow-hidden flex-shrink-0;
+    }
+
+    .place-type-badge {
+        @apply bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider h-fit;
     }
 
     /* Splash Screen (index.html) */
