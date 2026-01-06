@@ -49,14 +49,14 @@
 
 .input-wrapper input {
     width: 100%;
-    padding: 10px 12px 10px 36px;
+    padding: 10px 12px 10px 44px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    font-size: 14px;
-    background: var(--bg);
+    font-size: 15px;
+    background: var(--surface0);
     color: var(--text);
-    transition: all 0.2s ease;
-    height: 44px;
+    transition: all var(--transition);
+    height: 48px;
     box-sizing: border-box;
 }
 
@@ -76,17 +76,17 @@
     justify-content: center;
     gap: var(--space-sm);
     padding: 0 var(--space-xl);
-    background: linear-gradient(135deg, var(--primary) 0%, #667eea 100%);
-    color: white;
+    background: var(--primary);
+    color: var(--crust);
     border: none;
-    border-radius: var(--radius-lg);
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-fast);
     white-space: nowrap;
-    height: 44px;
-    min-width: 100px;
+    height: 48px;
+    min-width: 160px;
 }
 
 .search-btn:hover {
@@ -125,20 +125,21 @@
 }
 
 .quick-tag {
-    padding: var(--space-xs) var(--space-md);
-    background: var(--bg);
+    padding: var(--space-xs) var(--space-lg);
+    background: var(--surface0);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-full);
     font-size: 13px;
-    color: var(--text);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 .quick-tag:hover {
-    background: var(--primary);
-    color: white;
+    background: var(--primary-light);
+    color: var(--primary);
     border-color: var(--primary);
+    transform: translateY(-1px);
 }
 
 /* Results Section */
@@ -311,7 +312,7 @@
     height: 80%;
     top: 10%;
     left: 10%;
-    border-top-color: #667eea;
+    border-top-color: var(--accent);
     animation-delay: 0.1s;
 }
 
@@ -320,7 +321,7 @@
     height: 60%;
     top: 20%;
     left: 20%;
-    border-top-color: #764ba2;
+    border-top-color: var(--blue);
     animation-delay: 0.2s;
 }
 

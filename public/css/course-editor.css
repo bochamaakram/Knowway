@@ -13,22 +13,26 @@
 }
 
 .sidebar-list {
-    background: var(--bg-card);
+    background: var(--mantle);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
 .sidebar-header {
-    padding: var(--space-md);
+    padding: var(--space-lg);
+    /* Increased from space-md */
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--space-md);
 }
 
 .sidebar-title {
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
 }
 
 .course-list-item,
@@ -67,10 +71,11 @@
 }
 
 .editor-panel {
-    background: var(--bg-card);
+    background: var(--mantle);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-md);
 }
 
 .editor-header {
@@ -81,8 +86,9 @@
 }
 
 .editor-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .lesson-content-editor {
@@ -97,18 +103,21 @@
 
 .add-lesson-btn {
     width: 100%;
-    padding: var(--space-md);
+    padding: var(--space-lg);
     border: 2px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    background: transparent;
+    border-radius: var(--radius-lg);
+    background: var(--surface0);
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all var(--transition-fast);
+    font-weight: 600;
+    font-size: 14px;
 }
 
 .add-lesson-btn:hover {
     border-color: var(--primary);
     color: var(--primary);
+    background: var(--primary-light);
 }
 
 .lesson-actions {

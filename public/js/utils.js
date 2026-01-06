@@ -110,7 +110,7 @@ async function updateNavbar() {
         userContainer.innerHTML = `
             ${pointsHtml}
             <a href="profile.html">
-                <button class="btn btn-sm" style="background:var(--primary);color:var(--crust);width:40px;height:40px;border-radius:var(--radius-full);font-weight:700;">
+                <button class="user-avatar-btn">
                     ${user.username.charAt(0).toUpperCase()}
                 </button>
             </a>

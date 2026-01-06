@@ -138,6 +138,7 @@
                         <div class="editor-header">
                             <h2 class="editor-title">Lessons: <span id="currentCourseName"></span></h2>
                             <div>
+                                <button class="btn btn-secondary btn-sm" onclick="showQuizEditor()">Manage Quiz</button>
                                 <button class="btn btn-secondary btn-sm" onclick="editCurrentCourse()">Edit
                                     Course</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteCurrentCourse()">Delete</button>
@@ -175,6 +176,36 @@
                                 <button type="submit" class="btn btn-primary">Save Lesson</button>
                                 <button type="button" class="btn btn-danger" id="deleteLessonBtn" style="display:none"
                                     onclick="deleteCurrentLesson()">Delete Lesson</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="quizEditorPanel" class="editor-panel hidden">
+                        <div class="editor-header">
+                            <h2 class="editor-title">Quiz Editor</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="cancelQuizForm()">Cancel</button>
+                        </div>
+                        <form id="quizForm">
+                            <div class="form-group">
+                                <label class="form-label">Quiz Title</label>
+                                <input type="text" id="quizTitleInput" class="form-control" placeholder="Final Quiz"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Passing Score (%)</label>
+                                <input type="number" id="quizPassingScore" class="form-control" value="85" min="0"
+                                    max="100">
+                            </div>
+
+                            <h3 style="margin: var(--space-xl) 0 var(--space-md)">Questions</h3>
+                            <div id="quizQuestionsList"></div>
+
+                            <button type="button" class="add-lesson-btn" onclick="addQuizQuestion()"
+                                style="margin-bottom:var(--space-lg)">+ Add Question</button>
+
+                            <div class="lesson-actions">
+                                <button type="submit" class="btn btn-primary">Save Quiz</button>
+                                <button type="button" class="btn btn-danger" onclick="deleteQuiz()">Delete Quiz</button>
                             </div>
                         </form>
                     </div>

@@ -5,6 +5,7 @@ let myCourses = [];
 let currentCourse = null;
 let currentLessons = [];
 let editingLesson = null;
+let currentQuiz = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     updateNavbar();
@@ -146,10 +147,44 @@ function setupForms() {
             }
         } catch (e) { showToast('Error', 'error'); }
     });
+
+    document.getElementById('quizForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const questions = [];
+        const questionEls = document.querySelectorAll('.quiz-editor-question');
+
+        questionEls.forEach(qEl => {
+            const questionText = qEl.querySelector('.question-text-input').value;
+            const options = Array.from(qEl.querySelectorAll('.option-input')).map(opt => opt.value);
+            const correctIndex = parseInt(qEl.querySelector('input[name^="correct_"]:checked').value);
+
+            questions.push({
+                question: questionText,
+                options,
+                correct_index: correctIndex
+            });
+        });
+
+        const data = {
+            title: document.getElementById('quizTitleInput').value || 'Final Quiz',
+            passing_score: parseInt(document.getElementById('quizPassingScore').value) || 85,
+            questions
+        };
+
+        try {
+            const res = await api.saveQuiz(currentCourse.id, data);
+            if (res.success) {
+                showToast('Quiz saved!');
+                cancelQuizForm();
+            } else {
+                showToast(res.message || 'Failed to save quiz', 'error');
+            }
+        } catch (e) { showToast('Error saving quiz', 'error'); }
+    });
 }
 
 function hideAllPanels() {
-    ['welcomePanel', 'courseFormPanel', 'lessonsPanel', 'lessonFormPanel'].forEach(id =>
+    ['welcomePanel', 'courseFormPanel', 'lessonsPanel', 'lessonFormPanel', 'quizEditorPanel'].forEach(id =>
         document.getElementById(id).classList.add('hidden')
     );
 }
@@ -253,4 +288,80 @@ async function deleteCurrentLesson() {
             showToast(res.message || 'Failed', 'error');
         }
     } catch (e) { showToast('Error', 'error'); }
+}
+
+async function showQuizEditor() {
+    try {
+        const res = await api.getQuiz(currentCourse.id);
+        currentQuiz = res.success ? res.quiz : null;
+
+        hideAllPanels();
+        document.getElementById('quizEditorPanel').classList.remove('hidden');
+
+        document.getElementById('quizTitleInput').value = currentQuiz?.title || 'Final Quiz';
+        document.getElementById('quizPassingScore').value = currentQuiz?.passing_score || 85;
+
+        const container = document.getElementById('quizQuestionsList');
+        container.innerHTML = '';
+
+        if (currentQuiz?.questions?.length) {
+            currentQuiz.questions.forEach(q => addQuizQuestion(q));
+        } else {
+            addQuizQuestion(); // Start with one empty question
+        }
+    } catch (e) { showToast('Error loading quiz', 'error'); }
+}
+
+function addQuizQuestion(data = null) {
+    const container = document.getElementById('quizQuestionsList');
+    const qCount = container.children.length;
+    const qDiv = document.createElement('div');
+    qDiv.className = 'editor-panel quiz-editor-question';
+    qDiv.style.marginBottom = 'var(--space-lg)';
+
+    const options = data?.options || ['', '', '', ''];
+    const correctIndex = data?.correct_index ?? 0;
+
+    qDiv.innerHTML = `
+        <div class="editor-header">
+            <h4 style="margin:0">Question ${qCount + 1}</h4>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.quiz-editor-question').remove()">Remove</button>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control question-text-input" placeholder="Enter question..." value="${escapeHtml(data?.question || '')}" required>
+        </div>
+        <div class="quiz-editor-options" style="display:grid;gap:12px">
+            ${options.map((opt, i) => `
+                <div style="display:flex;align-items:center;gap:12px">
+                    <input type="radio" name="correct_${qCount}" value="${i}" ${i === correctIndex ? 'checked' : ''} required>
+                    <input type="text" class="form-control option-input" placeholder="Option ${i + 1}" value="${escapeHtml(opt)}" required>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    container.appendChild(qDiv);
+}
+
+function cancelQuizForm() {
+    hideAllPanels();
+    document.getElementById('lessonsPanel').classList.remove('hidden');
+}
+
+async function deleteQuiz() {
+    if (!currentQuiz) return;
+    if (!confirm('Are you sure you want to delete this quiz?')) return;
+
+    // The current API doesn't have a direct deleteQuiz, but we can save with 0 questions or update backend controller.
+    // For now, let's just clear it (save with empty questions if backend supports it)
+    try {
+        const res = await api.saveQuiz(currentCourse.id, {
+            title: 'Final Quiz',
+            passing_score: 85,
+            questions: []
+        });
+        if (res.success) {
+            showToast('Quiz deleted (cleared)');
+            cancelQuizForm();
+        }
+    } catch (e) { showToast('Error deleting quiz', 'error'); }
 }

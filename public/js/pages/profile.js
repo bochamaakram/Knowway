@@ -80,7 +80,12 @@ async function loadDashboardData() {
 function renderProgressList(courses) {
     const container = document.getElementById('progressList');
     if (!courses.length) {
-        container.innerHTML = '<div class="empty-state"><p>No courses in progress</p></div>';
+        container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-icon icon-books"></div>
+            <p>No courses in progress</p>
+            <a href="explore.html" class="btn btn-primary btn-sm" style="margin-top: 12px">Start Learning</a>
+        </div>`;
         return;
     }
 
@@ -104,7 +109,12 @@ function renderProgressList(courses) {
 function renderWishlist(favorites) {
     const container = document.getElementById('wishlistPreview');
     if (!favorites.length) {
-        container.innerHTML = '<div class="empty-state"><p>No courses in favorites</p></div>';
+        container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-icon icon-heart"></div>
+            <p>No courses in favorites</p>
+            <a href="explore.html" class="btn btn-secondary btn-sm" style="margin-top: 12px">Explore Courses</a>
+        </div>`;
         return;
     }
 
@@ -122,7 +132,11 @@ function renderWishlist(favorites) {
 function renderRecentActivity(purchases) {
     const container = document.getElementById('activityList');
     if (!purchases.length) {
-        container.innerHTML = '<div class="empty-state"><p>No recent activity</p></div>';
+        container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-state-icon icon-clock"></div>
+            <p>No recent activity</p>
+        </div>`;
         return;
     }
 

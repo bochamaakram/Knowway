@@ -37,7 +37,12 @@
 
     <section class="search-section">
         <div class="container">
-            <div class="filter-row">
+            <button type="button" class="mobile-filter-toggle" onclick="toggleFilters()">
+                <span class="icon-filter"></span>
+                <span>Filters</span>
+                <span class="icon-chevron-down"></span>
+            </button>
+            <div class="filter-row" id="filterRow">
                 <input type="text" id="searchInput" class="filter-search" placeholder="Search my courses...">
                 <select id="categoryFilter" class="filter-select">
                     <option value="">All Categories</option>
@@ -81,8 +86,31 @@
         </div>
     </main>
 
+    <nav class="mobile-bottom-nav">
+        <a href="explore.html" class="nav-item">
+            <span class="nav-icon icon-search"></span>
+            <span class="nav-label">Explore</span>
+        </a>
+        <a href="in-person.html" class="nav-item">
+            <span class="nav-icon icon-location"></span>
+            <span class="nav-label">In-Person</span>
+        </a>
+        <a href="learning.html" class="nav-item active">
+            <span class="nav-icon icon-books"></span>
+            <span class="nav-label">My Learning</span>
+        </a>
+    </nav>
+
     <div id="toastContainer" class="toast-container"></div>
 
+    <script>
+        function toggleFilters() {
+            const row = document.getElementById('filterRow');
+            const btn = document.querySelector('.mobile-filter-toggle');
+            row.classList.toggle('show');
+            btn.classList.toggle('active');
+        }
+    </script>
     <script src="js/api.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/pages/learning.js"></script>

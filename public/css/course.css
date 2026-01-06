@@ -312,8 +312,22 @@
 .mobile-nav {
     display: none;
     background: var(--mantle);
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
     border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 60px;
+    /* Below compact navbar */
+    z-index: 50;
+}
+
+.mobile-nav::before {
+    content: 'COURSE NAVIGATION';
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--overlay0);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
 }
 
 @media (max-width: 900px) {

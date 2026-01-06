@@ -49,18 +49,20 @@
                 <div class="panel-header">
                     <h2 class="panel-title">Users</h2>
                 </div>
-                <table class="table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTable"></tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Search Logs Panel -->
@@ -68,19 +70,21 @@
                 <div class="panel-header">
                     <h2 class="panel-title">Search Logs</h2>
                 </div>
-                <table class="table" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Date</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Keyword</th>
-                            <th>City</th>
-                        </tr>
-                    </thead>
-                    <tbody id="searchLogsTable"></tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Date</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Keyword</th>
+                                <th>City</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchLogsTable"></tbody>
+                    </table>
+                </div>
                 <div id="logsLoadingState" class="empty-state hidden">
                     <div class="spinner"></div>
                 </div>
