@@ -122,12 +122,25 @@ function renderSidebar() {
 
     nav.innerHTML = navHtml;
 
-    document.getElementById('mobileSelect').innerHTML = `
-        <option value="">Course Overview</option>
-    ` + lessons.map((l, i) => {
+    // Mobile dropdown with Course Overview at top
+    const isOnOverview = !currentLesson && document.getElementById('quizContent')?.style.display !== 'block';
+    const isOnQuiz = document.getElementById('quizContent')?.style.display === 'block';
+
+    let mobileOptions = `<option value="" ${isOnOverview ? 'selected' : ''}>📚 Course Overview</option>`;
+
+    mobileOptions += lessons.map((l, i) => {
         const isCompleted = completedLessonIds.includes(l.id);
-        return `<option value="${isPurchased ? l.id : ''}" ${currentLesson?.id === l.id ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${isCompleted ? '✓ ' : ''}${i + 1}. ${l.title}${!isPurchased ? ' [Locked]' : ''}</option>`;
+        const isSelected = currentLesson?.id === l.id;
+        return `<option value="${isPurchased ? l.id : ''}" ${isSelected ? 'selected' : ''} ${!isPurchased ? 'disabled' : ''}>${isCompleted ? '✓ ' : ''}${i + 1}. ${l.title}${!isPurchased ? ' 🔒' : ''}</option>`;
     }).join('');
+
+    // Add quiz option if available
+    if (quiz && quiz.questions && quiz.questions.length > 0) {
+        const allLessonsComplete = completedLessonIds.length === lessons.length && lessons.length > 0;
+        mobileOptions += `<option value="quiz" ${isOnQuiz ? 'selected' : ''} ${!isPurchased || !allLessonsComplete ? 'disabled' : ''}>${quizPassed ? '✓ ' : '📝 '}Final Quiz${!isPurchased ? ' 🔒' : !allLessonsComplete ? ' (Complete all lessons)' : ''}</option>`;
+    }
+
+    document.getElementById('mobileSelect').innerHTML = mobileOptions;
 
     updateEnrollButton();
 }
@@ -253,6 +266,7 @@ async function markLessonComplete() {
 
 function navigateToLesson(lessonId) {
     if (!lessonId) { showOverview(); return; }
+    if (lessonId === 'quiz') { showQuizSection(); return; }
     if (!isPurchased) {
         showEnrollPrompt();
         return;
