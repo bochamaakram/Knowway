@@ -9,6 +9,7 @@ const urlsToCache = [
     '/profile.html',
     '/login.html',
     '/register.html',
+    '/css/main.css',
     '/css/output.css',
     '/manifest.json'
 ];
