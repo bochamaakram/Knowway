@@ -218,6 +218,12 @@
     <script src="js/utils.js"></script>
     <script src="js/pages/course-editor.js"></script>
     <script src="js/chatbot.js"></script>
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => { });
+        }
+    </script>
 </body>
 
 </html>

@@ -1,41 +1,39 @@
 // Knowway Service Worker
-const CACHE_NAME = 'knowway-v3'; // Bumped version to clear old cache and fix CSS loading
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/explore.html',
-    '/learning.html',
-    '/course.html',
-    '/profile.html',
-    '/login.html',
-    '/register.html',
-    '/css/output.css',
+// Updated: Force fresh content - increment version to bust cache
+const CACHE_NAME = 'knowway-v4-' + Date.now(); // Dynamic version to force cache refresh
+const STATIC_CACHE_NAME = 'knowway-static-v4'; // Separate cache for truly static assets
+
+// Only cache truly static assets (images, fonts)
+const staticAssetsToCache = [
     '/manifest.json'
 ];
 
-// Install event - cache core assets
+// Install event - minimal caching
 self.addEventListener('install', (event) => {
+    console.log('Service Worker installing, cache version:', CACHE_NAME);
     event.waitUntil(
-        caches.open(CACHE_NAME)
+        caches.open(STATIC_CACHE_NAME)
             .then((cache) => {
-                console.log('Opened cache');
-                return cache.addAll(urlsToCache);
+                console.log('Caching static assets');
+                return cache.addAll(staticAssetsToCache);
             })
             .catch((error) => {
                 console.log('Cache install failed:', error);
             })
     );
-    // Activate immediately
+    // Activate immediately - don't wait
     self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - AGGRESSIVELY clean up ALL old caches
 self.addEventListener('activate', (event) => {
+    console.log('Service Worker activating, clearing old caches');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
+                    // Delete ALL caches except the current static cache
+                    if (cacheName !== STATIC_CACHE_NAME) {
                         console.log('Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -47,16 +45,20 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Fetch event - NETWORK-FIRST for API and CSS, CACHE-FIRST for other static assets
+// Fetch event - NETWORK-FIRST for everything except truly static assets
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
+
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') {
+        return;
+    }
 
     // NEVER cache API requests - always go to network
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(
             fetch(event.request)
                 .catch(() => {
-                    // If network fails, return a JSON error
                     return new Response(
                         JSON.stringify({ success: false, message: 'Network error - you are offline' }),
                         { headers: { 'Content-Type': 'application/json' } }
@@ -66,64 +68,47 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // NETWORK-FIRST for CSS files to prevent stale styles on reload
-    if (url.pathname.endsWith('.css')) {
+    // NETWORK-FIRST for HTML, CSS, and JS files - always fetch fresh
+    if (url.pathname.endsWith('.html') ||
+        url.pathname.endsWith('.css') ||
+        url.pathname.endsWith('.js') ||
+        url.pathname === '/' ||
+        url.pathname === '') {
         event.respondWith(
-            fetch(event.request)
+            fetch(event.request, { cache: 'no-store' }) // Force bypass browser cache too
                 .then((response) => {
-                    // Cache the fresh CSS for offline use
-                    if (response && response.status === 200) {
-                        const responseToCache = response.clone();
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
-                    }
                     return response;
                 })
                 .catch(() => {
-                    // Fall back to cache if network fails
-                    return caches.match(event.request);
+                    // Only fall back to cache if completely offline
+                    return caches.match(event.request) || caches.match('/index.html');
                 })
         );
         return;
     }
 
-    // For other static assets, use cache-first strategy
+    // For truly static assets (images, fonts), use cache-first
     event.respondWith(
         caches.match(event.request)
             .then((response) => {
-                // Return cached version or fetch from network
                 if (response) {
                     return response;
                 }
-                return fetch(event.request).then((response) => {
-                    // Only cache static assets (HTML, CSS, JS, images)
-                    if (!response || response.status !== 200 || response.type !== 'basic' || event.request.method !== 'GET') {
-                        return response;
+                return fetch(event.request).then((networkResponse) => {
+                    // Only cache images and fonts
+                    const contentType = networkResponse.headers.get('content-type') || '';
+                    if (contentType.includes('image/') || contentType.includes('font/')) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(STATIC_CACHE_NAME)
+                            .then((cache) => {
+                                cache.put(event.request, responseToCache);
+                            });
                     }
-
-                    // Only cache known static file types
-                    const contentType = response.headers.get('content-type') || '';
-                    if (!contentType.includes('text/html') &&
-                        !contentType.includes('text/css') &&
-                        !contentType.includes('javascript') &&
-                        !contentType.includes('image/')) {
-                        return response;
-                    }
-
-                    // Clone the response
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            cache.put(event.request, responseToCache);
-                        });
-                    return response;
+                    return networkResponse;
                 });
             })
             .catch(() => {
-                // Return offline page if available
-                return caches.match('/index.html');
+                return new Response('Offline', { status: 503 });
             })
     );
 });
