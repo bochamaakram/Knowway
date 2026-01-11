@@ -2327,7 +2327,7 @@
         border-width: 1px;
         border-color: var(--color-surface1);
         background-color: var(--color-surface0);
-        padding: calc(var(--spacing)*8);
+        padding: c;
         --tw-shadow: 0 4px 16px var(--tw-shadow-color, #0003);
         box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)
     }
